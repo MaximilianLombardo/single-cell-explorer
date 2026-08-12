@@ -1,0 +1,21 @@
+# Dependencies for the vendored h5ad -> CXG converter.
+#
+# Deliberately a SEPARATE environment from server/requirements.txt: the server pins
+# anndata==0.10.9 and tiledb==0.34.0, while cellxgene-schema (which the converter
+# borrows read_h5ad and get_matrix_format from) requires anndata>=0.11. The converter
+# is a build-time tool, so it does not need to share the server's runtime env.
+cellxgene-schema>=7.0.0
+dask>=2024.12.0
+numpy>=1.24.0
+pandas>=2.2.0
+psutil>=5.9.0
+scipy>=1.14.0
+tiledb>=0.34.0
+tqdm>=4.66.0
+
+# Optional -- only needed for spatial (pyvips, PIL, boto3) or ATAC (pysam) datasets.
+# The vendored code imports these lazily, so plain scRNA conversions do not need them.
+# pysam>=0.22.0
+# pyvips>=2.2.0
+# Pillow>=10.0.0
+# boto3>=1.26.0
