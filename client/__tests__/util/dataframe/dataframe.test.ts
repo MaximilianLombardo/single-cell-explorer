@@ -1631,9 +1631,11 @@ describe("unified categorical column methods", () => {
     expect(col.getInternalRep("green")).toBe(2);
     expect(col.getInternalRep("nonexistent")).toBe("nonexistent");
 
-    // Test getCrossfilterValues (should return codes for dict-encoded)
+    // Test getCrossfilterValues (should return codes for dict-encoded).
+    // Dict-encoded columns keep their codes in a typed array, so compare the
+    // values rather than the container type.
     const crossfilterValues = col.getCrossfilterValues();
-    expect(crossfilterValues).toEqual([0, 1, 2, 0]);
+    expect(Array.from(crossfilterValues)).toEqual([0, 1, 2, 0]);
 
     // Test selectByCrossfilterValues with codes
     const selectedByCrossfilter = col.selectByCrossfilterValues([0, 2]);
@@ -1644,7 +1646,7 @@ describe("unified categorical column methods", () => {
       "red",
       "green",
     ]);
-    expect(crossfilterForLabels.sort()).toEqual([0, 0, 2]);
+    expect(Array.from(crossfilterForLabels).sort()).toEqual([0, 0, 2]);
   });
 
   test("edge cases for unified methods", () => {

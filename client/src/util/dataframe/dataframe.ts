@@ -428,9 +428,16 @@ class Dataframe {
     get.selectByCrossfilterValues = function selectByCrossfilterValues(
       values: (string | number)[]
     ): boolean[] {
-      // Convert all values to internal representation
+      /*
+      Convert all values to internal representation.  Do NOT stringify first -
+      the internal representation of a dict-encoded column is a numeric code,
+      and a plain array column may natively hold numbers or booleans.  Coercing
+      to a string would make every comparison below fail.  getInternalRep()
+      passes through any value which is not a known label, so codes and native
+      values are both accepted.
+      */
       const internalValues = values.map((value) =>
-        get.getInternalRep(String(value))
+        get.getInternalRep(value as string)
       );
       return iterateColumn((item) =>
         internalValues.includes(item as string | number)

@@ -15,8 +15,10 @@ describe("fillRange", () => {
     expect(fillRange(new Uint32Array(6))).toEqual(
       new Uint32Array([0, 1, 2, 3, 4, 5])
     );
-    expect(fillRange(new Array(4), 1)).toEqual(new Uint32Array([1, 2, 3, 4]));
-    expect(fillRange([])).toEqual(new Uint32Array([]));
+    expect(fillRange(new Uint32Array(4), 1)).toEqual(
+      new Uint32Array([1, 2, 3, 4])
+    );
+    expect(fillRange(new Uint32Array(0))).toEqual(new Uint32Array([]));
   });
 });
 
