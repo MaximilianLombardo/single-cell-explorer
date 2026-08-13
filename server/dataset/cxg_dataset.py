@@ -980,10 +980,16 @@ class CxgDataset(Dataset):
         Given a gene name and genome version, returns the chromosome, start, end,
         and sorted list of genes on the same chromosome.
         """
-        try:
-            gene_data = GENE_DATA_CACHE.get(genome_version)
-        except KeyError as e:
-            raise DatasetAccessError(f"Genome version {genome_version} not preloaded") from e
+        # dict.get() returns None rather than raising, so the cache being empty (e.g.
+        # SKIP_ATAC_CACHE, or a genome that was never preloaded) has to be checked
+        # explicitly -- otherwise it surfaces as an AttributeError 500 further down.
+        gene_data = GENE_DATA_CACHE.get(genome_version)
+        if not gene_data:
+            raise DatasetAccessError(
+                f"Genome version {genome_version} not preloaded. "
+                "Set ATAC_BASE_URI to a location holding gene_data_<version>.json, "
+                "and ensure SKIP_ATAC_CACHE is unset."
+            )
 
         target_gene = gene_data.get(gene_name)
         if not target_gene:
