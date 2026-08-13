@@ -69,7 +69,9 @@ def main() -> int:
         )
     finally:
         if tmp and os.path.exists(tmp):
+            # remove the temp copy and the directory created to hold it
             os.unlink(tmp)
+            os.rmdir(os.path.dirname(tmp))
 
     size = sum(os.path.getsize(os.path.join(r, f))
                for r, _, fs in os.walk(args.output) for f in fs)
@@ -95,9 +97,12 @@ def _ensure_uns(input_path, title):
     if "title" not in adata.uns:
         adata.uns["title"] = title or os.path.splitext(os.path.basename(input_path))[0]
 
-    fd, tmp = tempfile.mkstemp(suffix=".h5ad")
-    os.close(fd)
-    os.unlink(tmp)
+    # H5ADDataFile derives dataset_title from the INPUT FILENAME, not from uns["title"]
+    # (extract_metadata_about_dataset never reads it back off corpora_properties). So
+    # the temp copy has to keep the original basename, or the dataset ends up titled
+    # something like "tmpv3k9x1qa" in Explorer.
+    tmpdir = tempfile.mkdtemp(prefix="h5ad_to_cxg_")
+    tmp = os.path.join(tmpdir, os.path.basename(input_path))
     adata.write_h5ad(tmp)
     return tmp, tmp
 

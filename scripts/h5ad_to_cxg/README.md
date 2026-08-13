@@ -55,7 +55,27 @@ package (`read_h5ad`, `get_matrix_format`).
 | `uns["default_embedding"]` | optional | which `obsm` key Explorer opens with |
 | `uns["X_approximate_distribution"]` | optional | |
 
-No ontology term IDs are required. Arbitrary `obs` columns — including annotations from
+No ontology term IDs are required.
+
+### How pipeline annotations come through
+
+Verified against a synthetic pipeline-style h5ad (`obs` categoricals of str, bool, int
+and float dtype, plus a plain float column, and no `uns` at all):
+
+| obs column dtype | CXG result |
+|---|---|
+| categorical of `str` | `categorical`, categories preserved |
+| categorical of `bool` | `categorical`, **stringified** to `['False','True']` |
+| categorical of `int` / `float` | `categorical`, **no `categories` list in the schema** |
+| plain `float32` | `float32`, shown under Continuous |
+
+The int/float case looks alarming in the schema (`categories: null` from `/schema`)
+but works: Explorer derives the labels from the data at runtime. A synthetic
+`leiden_cluster` of 8 integer clusters rendered labels 0-7 with counts summing exactly
+to the cell total.
+
+Practical upshot: arbitrary `obs` columns from your own pipeline pass straight through
+and appear under "Author Categories". Nothing needs stringifying by hand. Arbitrary `obs` columns — including annotations from
 your own pipeline — pass through and become categorical/continuous fields in Explorer.
 
 `--fill-missing-uns` synthesises the two required keys into a temp copy of your file, so
