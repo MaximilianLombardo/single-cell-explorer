@@ -53,6 +53,36 @@ jobs:
         run: |
           mypy --config-file pyproject.toml
 
+  # Client unit tests (everything under client/__tests__ except e2e). These run as
+  # the "unit" Playwright project and use no browser fixture, so no browser binaries
+  # are needed and the whole suite finishes in ~20s.
+  #
+  # This job exists because the suite had no runner at all for a long time: jest was
+  # dropped from the dependencies while the Makefile target still invoked it, and
+  # Playwright's projects matched only the e2e files. Nothing caught, for example, a
+  # 2022 change to the ColorTable.rgb memory layout that left its tests asserting
+  # against a shape which no longer existed. Keep this job wired up or the suite will
+  # silently rot again.
+  unit-test-client:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: "client/.nvmrc"
+          cache: "npm"
+          cache-dependency-path: "client/package-lock.json"
+      - name: Install client dependencies
+        working-directory: ./client
+        # Puppeteer's chromium download is not needed here and fails on some runners
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "true"
+        run: npm ci
+      - name: Run client unit tests
+        working-directory: ./client
+        run: npm run test
+
   unit-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
