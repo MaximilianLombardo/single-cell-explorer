@@ -192,7 +192,12 @@ class Server:
 
         self.env = os.getenv("DEPLOYMENT_STAGE", "staging")
         self.env = "staging" if self.env not in ["staging", "prod"] else self.env
-        self.atac_base_uri = f"s3://atac-static-{self.env}"
+        # ATAC_BASE_URI lets a self-hosted deployment point at its own copy of the
+        # genome reference files (gene_data_<version>.json, cytoband_<version>.json)
+        # instead of CZI's private s3://atac-static-* buckets, which are not readable
+        # outside CZI. Accepts any DataLocator URI, including a local directory.
+        # See scripts/atac_reference/ for building those files from public sources.
+        self.atac_base_uri = os.getenv("ATAC_BASE_URI") or f"s3://atac-static-{self.env}"
 
         if not os.environ.get("SKIP_ATAC_CACHE"):
             preload_gene_data(atac_base_uri=self.atac_base_uri)

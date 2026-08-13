@@ -15,6 +15,7 @@ dist/
 
 # Environments
 venv/
+.venv/
 explorer/
 
 # client build

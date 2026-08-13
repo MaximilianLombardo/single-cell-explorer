@@ -10,4 +10,12 @@ export PYTHONPATH=${PROJECT_ROOT}  # permits module discovery when run from some
 
 cd "${PROJECT_ROOT}"
 
-PROJECT_ROOT=${PROJECT_ROOT} python -m server.cli.launch -d $@
+# Prefer the uv-managed venv (see `make dev-env-server`) so the server always runs on
+# its pinned deps rather than whatever interpreter happens to be active. Falls back to
+# `python` if the venv is absent or one is already activated.
+PYTHON_BIN="python"
+if [ -z "${VIRTUAL_ENV}" ] && [ -x "${PROJECT_ROOT}/.venv/bin/python" ]; then
+  PYTHON_BIN="${PROJECT_ROOT}/.venv/bin/python"
+fi
+
+PROJECT_ROOT=${PROJECT_ROOT} "${PYTHON_BIN}" -m server.cli.launch -d $@
