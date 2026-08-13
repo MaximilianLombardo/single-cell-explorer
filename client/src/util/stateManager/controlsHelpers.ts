@@ -90,8 +90,18 @@ export function createCategorySummaryFromDfCol(
   const { categories: allCategoryValues } = colSchema;
   const categoryValues = allCategoryValues;
   const labelCounts = dfCol.getLabelCounts();
+  /*
+  Counts are keyed by the column's native label value.  For dict-encoded columns
+  that is always a string, but for plain arrays it is whatever type the column
+  holds - number, boolean, etc.  Look up the native value first, and only fall
+  back to its string form, or non-string categories (eg, 83, true) would all
+  silently count as zero.
+  */
   const categoryValueCounts = allCategoryValues.map(
-    (label: Category) => labelCounts.get(String(label)) ?? 0
+    (label: Category) =>
+      labelCounts.get(label as unknown as string) ??
+      labelCounts.get(String(label)) ??
+      0
   );
 
   const categoryValueIndices = new Map(categoryValues.map((v, i) => [v, i]));

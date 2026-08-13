@@ -13,11 +13,11 @@ describe("Dataframe column histogram", () => {
     );
 
     const h1 = df.col("cat").histogramCategoricalBy(df.col("name"));
-    expect(h1).toMatchObject(
-      Object.fromEntries([
-        ["n1", Object.fromEntries([["c1", 1]])],
-        ["n2", Object.fromEntries([["c2", 1]])],
-        ["n3", Object.fromEntries([["c3", 1]])],
+    expect(h1).toEqual(
+      new Map([
+        ["n1", new Map([["c1", 1]])],
+        ["n2", new Map([["c2", 1]])],
+        ["n3", new Map([["c3", 1]])],
       ])
     );
     // memoized?
@@ -33,8 +33,8 @@ describe("Dataframe column histogram", () => {
     );
 
     const h1 = df.col("value").histogramContinuousBy(3, [0, 2], df.col("name"));
-    expect(h1).toMatchObject(
-      Object.fromEntries([
+    expect(h1).toEqual(
+      new Map([
         ["n1", [1, 0, 0]],
         ["n2", [0, 1, 0]],
         ["n3", [0, 0, 1]],
@@ -55,8 +55,8 @@ describe("Dataframe column histogram", () => {
     );
 
     const h1 = df.col("cat").histogramCategorical();
-    expect(h1).toMatchObject(
-      Object.fromEntries([
+    expect(h1).toEqual(
+      new Map([
         ["c1", 1],
         ["c2", 1],
         ["c3", 1],
