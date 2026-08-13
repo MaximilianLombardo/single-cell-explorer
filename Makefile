@@ -6,7 +6,6 @@ SERVERBUILD := $(BUILDDIR)/server
 CLEANFILES :=  $(BUILDDIR)/ client/build build dist cellxgene.egg-info
 
 PART ?= patch
-PYTHON_VERSION ?= 3.11
 
 # CLEANING COMMANDS
 
@@ -109,20 +108,26 @@ dev-env-client:
 	cd client && $(MAKE) ci
 
 
-# Server deps live in a uv-managed venv at ./.venv so they stay isolated from
-# whatever interpreter happens to be active. Run commands with `.venv/bin/python`,
-# or `source .venv/bin/activate` first.
+# Server deps are declared in pyproject.toml and locked in uv.lock. `uv sync` makes
+# ./.venv match the lock exactly -- including REMOVING anything that should not be
+# there, which `pip install -r` cannot do. Run commands with `uv run <cmd>` or
+# `.venv/bin/python`.
 .PHONY: dev-env-server
 dev-env-server:
-	uv venv --python $(PYTHON_VERSION) .venv
-	uv pip install --python .venv -r server/requirements-dev.txt
+	uv sync --group dev
 
-# The h5ad -> CXG converter needs its own env: it depends on cellxgene-schema, which
-# requires anndata>=0.11, while the server pins anndata==0.10.9.
+# The h5ad -> CXG converter is a separate uv project with its own lock and venv: it
+# needs cellxgene-schema (anndata>=0.11) while the server pins anndata==0.10.9, and
+# both environments have to be usable at the same time.
 .PHONY: dev-env-converter
 dev-env-converter:
-	uv venv --python $(PYTHON_VERSION) scripts/h5ad_to_cxg/.venv
-	uv pip install --python scripts/h5ad_to_cxg/.venv -r scripts/h5ad_to_cxg/requirements.txt
+	uv sync --project scripts/h5ad_to_cxg
+
+# Verify the committed locks still resolve. Fails if pyproject and uv.lock disagree.
+.PHONY: check-locks
+check-locks:
+	uv lock --check
+	uv lock --check --project scripts/h5ad_to_cxg
 
 # quicker than re-building client
 .PHONY: gen-package-lock

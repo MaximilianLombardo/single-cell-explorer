@@ -16,13 +16,14 @@ below.
 
 ## Usage
 
-The converter has **its own uv-managed venv**, separate from the server's. That is
+The converter is **its own uv project** (`scripts/h5ad_to_cxg/pyproject.toml` +
+`uv.lock`), separate from the server's. That is
 deliberate: it depends on `cellxgene-schema`, which requires `anndata>=0.11`, while
-`server/requirements.txt` pins `anndata==0.10.9`. Keeping them apart avoids a resolver
+the server pins `anndata==0.10.9` in the root `pyproject.toml`. Keeping them apart avoids a resolver
 fight over a tool that only runs at build time.
 
 ```bash
-make dev-env-converter          # creates scripts/h5ad_to_cxg/.venv via uv
+make dev-env-converter          # uv sync --project scripts/h5ad_to_cxg
 
 scripts/h5ad_to_cxg/.venv/bin/python scripts/h5ad_to_cxg/convert.py \
     input.h5ad output.cxg -v

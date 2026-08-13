@@ -10,12 +10,12 @@ export PYTHONPATH=${PROJECT_ROOT}  # permits module discovery when run from some
 
 cd "${PROJECT_ROOT}"
 
-# Prefer the uv-managed venv (see `make dev-env-server`) so the server always runs on
-# its pinned deps rather than whatever interpreter happens to be active. Falls back to
-# `python` if the venv is absent or one is already activated.
-PYTHON_BIN="python"
-if [ -z "${VIRTUAL_ENV}" ] && [ -x "${PROJECT_ROOT}/.venv/bin/python" ]; then
-  PYTHON_BIN="${PROJECT_ROOT}/.venv/bin/python"
+# `uv run` resolves the project environment from uv.lock, so the server always runs on
+# its pinned deps rather than whatever interpreter happens to be active. It also syncs
+# the venv first if it is missing or stale. Fall back to plain `python` where uv is not
+# installed, so this still works in a container that installed deps some other way.
+if command -v uv >/dev/null 2>&1; then
+  PROJECT_ROOT=${PROJECT_ROOT} exec uv run --frozen python -m server.cli.launch -d "$@"
+else
+  PROJECT_ROOT=${PROJECT_ROOT} exec python -m server.cli.launch -d "$@"
 fi
-
-PROJECT_ROOT=${PROJECT_ROOT} "${PYTHON_BIN}" -m server.cli.launch -d $@

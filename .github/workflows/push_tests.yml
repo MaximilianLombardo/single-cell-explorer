@@ -41,17 +41,20 @@ jobs:
         working-directory: ./client
         run: |
           npm run lint
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - name: Install dev dependencies
-        run: |
-          cd server
-          pip install -r requirements-dev.txt
+        run: make dev-env-server
+      - name: Verify the committed locks still resolve
+        run: make check-locks
       # We can't have mypy in the pre-commit hook without having it run on all files
       # in the repo, because (probably) the --all-files argument in pre-commit overrides
       # the more narrow specifying of files in pyproject.toml
       # TODO: Remove this if/when all files are mypy-compliant
       - name: Run mypy
-        run: |
-          mypy --config-file pyproject.toml
+        run: uv run mypy --config-file pyproject.toml
 
   # Client unit tests (everything under client/__tests__ except e2e). These run as
   # the "unit" Playwright project and use no browser fixture, so no browser binaries
@@ -87,18 +90,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      # uv provisions the interpreter itself from requires-python in pyproject.toml,
+      # so there is no setup-python step and no separate pip cache to key on.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: 3.12
-      - name: Python cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          enable-cache: true
       - uses: actions/setup-node@v4
         with:
           node-version-file: "client/.nvmrc"

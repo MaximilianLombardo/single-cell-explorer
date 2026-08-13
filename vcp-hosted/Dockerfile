@@ -14,8 +14,22 @@ RUN apt-get update && \
 
 COPY vcp-hosted/nginx.conf /etc/nginx/nginx.conf
 
-ADD server/requirements.txt .
-RUN python3 -m pip install -r requirements.txt
+# Python deps come from uv.lock, so the image gets the same versions as a developer
+# machine. uv also provisions the interpreter -- pyproject.toml requires >=3.12 and
+# this base image ships 3.10 -- so no deadsnakes PPA is needed.
+ENV UV_INSTALL_DIR=/usr/local/bin
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && uv --version
+
+ADD pyproject.toml uv.lock ./
+# --no-dev: runtime deps only, no pytest/mypy/black in the image.
+# --frozen: fail rather than silently re-resolve if the lock is stale.
+# --no-install-project: this is an application, not an installable package.
+RUN uv sync --frozen --no-dev --no-install-project
+
+# Put the venv first on PATH so the bare `gunicorn` in the start script resolves to
+# the locked one, leaving that script unchanged.
+ENV PATH="/.venv/bin:$PATH"
+ENV VIRTUAL_ENV=/.venv
 
 ADD Makefile Makefile
 ADD common.mk common.mk
