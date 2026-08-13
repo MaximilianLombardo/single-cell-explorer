@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { AnchorButton } from "@blueprintjs/core";
 import { spacesS } from "util/theme";
 import { getFeatureFlag } from "util/featureFlags/featureFlags";
 import { FEATURES } from "util/featureFlags/features";
@@ -65,5 +66,20 @@ export const ControlsWrapper = styled.div`
     align-items: flex-end;
     position: absolute;
     right: 0px;
+  }
+`;
+
+/**
+ * Menu bar action button.
+ *
+ * The `&&&` bumps specificity above Blueprint's disabled/loading rules, the
+ * strongest of which is `.bp5-button:not([class*="bp5-intent-"]).bp5-disabled`
+ * (0,3,0) and sets `cursor: not-allowed`. This replaces an inline
+ * `style={{ cursor: "pointer" }}`, which applied in every button state, so the
+ * escalation is required to keep the rendering identical.
+ */
+export const MenuBarAnchorButton = styled(AnchorButton)`
+  &&& {
+    cursor: pointer;
   }
 `;

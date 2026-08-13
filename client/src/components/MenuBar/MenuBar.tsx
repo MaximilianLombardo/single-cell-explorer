@@ -16,6 +16,7 @@ import styles from "./menubar.css";
 import {
   ControlsWrapper,
   EmbeddingWrapper,
+  MenuBarAnchorButton,
   MenuBarWrapper,
   ResponsiveMenuGroupOne,
   ResponsiveMenuGroupTwo,
@@ -276,7 +277,7 @@ const MenuBar = ({
         <ControlsWrapper>
           <ResponsiveMenuGroupTwo>
             <ButtonGroup className={styles.menubarButton}>
-              <AnchorButton
+              <MenuBarAnchorButton
                 type="button"
                 icon={IconNames.INFO_SIGN}
                 onClick={() => {
@@ -284,9 +285,6 @@ const MenuBar = ({
                     type: "toggle active info panel",
                     activeTab: "Dataset",
                   });
-                }}
-                style={{
-                  cursor: "pointer",
                 }}
                 data-testid="drawer"
               />
@@ -299,16 +297,13 @@ const MenuBar = ({
                   position="bottom"
                   hoverOpenDelay={globals.tooltipHoverOpenDelay}
                 >
-                  <AnchorButton
+                  <MenuBarAnchorButton
                     type="button"
                     icon={IconNames.CHAT}
                     onClick={() => {
                       dispatch({
                         type: "toggle agent panel",
                       });
-                    }}
-                    style={{
-                      cursor: "pointer",
                     }}
                     active={!agentPanelHidden}
                     intent={!agentPanelHidden ? "primary" : "none"}
@@ -329,13 +324,10 @@ const MenuBar = ({
             </ButtonGroup>
 
             {isTest && (
-              <AnchorButton
+              <MenuBarAnchorButton
                 className={styles.menubarButton}
                 type="button"
                 icon={IconNames.TORCH}
-                style={{
-                  cursor: "pointer",
-                }}
                 data-testid={GRAPH_AS_IMAGE_TEST_ID}
                 data-chromatic="ignore"
                 loading={screenCap}
