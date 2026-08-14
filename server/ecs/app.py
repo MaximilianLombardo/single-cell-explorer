@@ -49,10 +49,6 @@ class WSGIServer(Server):
 
         EXPLORER_STAGING_URL = "https://cellxgene.staging.single-cell.czi.technology"
 
-        EXPLORER_VCP_STAGING_URL = "https://platform.staging.virtual-cells.czi.technology"
-
-        EXPLORER_VCP_PROD_URL = "https://virtualcellmodels.cziscience.com"
-
         csp = {
             "default-src": ["'self'", HUBSPOT_FORMS_URL, HUBSPOT_JS_URL],
             "form-action": ["'self'", HUBSPOT_FORMS_URL],
@@ -62,8 +58,6 @@ class WSGIServer(Server):
                 HUBSPOT_FORMS_URL,
                 EXPLORER_DEV_URL,
                 EXPLORER_STAGING_URL,
-                EXPLORER_VCP_STAGING_URL,
-                EXPLORER_VCP_PROD_URL,
             ]
             + extra_connect_src,
             "script-src": [
@@ -72,8 +66,6 @@ class WSGIServer(Server):
                 PLAUSIBLE_URL,
                 HUBSPOT_FORMS_URL,
                 HUBSPOT_JS_URL,
-                EXPLORER_VCP_STAGING_URL,
-                EXPLORER_VCP_PROD_URL,
             ]
             + script_hashes,
             "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
@@ -84,8 +76,6 @@ class WSGIServer(Server):
                 EXPLORER_DEV_URL,
                 EXPLORER_STAGING_URL,
                 HUBSPOT_FORMS_URL_CDN,
-                EXPLORER_VCP_STAGING_URL,
-                EXPLORER_VCP_PROD_URL,
             ]
             + extra_connect_src
             + ["data:", HUBSPOT_FORMS_URL],
@@ -111,14 +101,6 @@ class WSGIServer(Server):
                     [
                         "https://canary-cellxgene.dev.single-cell.czi.technology/",
                         r"^http://localhost:\d+",
-                        r"^https://.*\.dev-vcp\.dev\.czi\.team$",
-                        "https://platform.staging.virtual-cells.czi.technology",
-                    ]
-                )
-            elif os.getenv("DEPLOYMENT_STAGE") in ["Prod", "prod"]:
-                allowed_origins.extend(
-                    [
-                        "https://virtualcellmodels.cziscience.com",
                     ]
                 )
             CORS(app, supports_credentials=True, origins=allowed_origins)
