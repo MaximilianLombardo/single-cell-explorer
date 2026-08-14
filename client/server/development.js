@@ -54,6 +54,28 @@ mw.waitUntilValid(() => {
 
 app.use(mw);
 
+/*
+Serve spatial Deep Zoom tiles, mirroring what the Flask server does when
+SPATIAL_DEEP_ZOOM_DIR is set.
+
+The client requests these from a same-origin path, which is correct in production
+where one server serves both the app and its assets. In development the client and
+API live on different ports, so this dev server has to serve them too -- otherwise
+the request lands here on :3000 and 404s.
+
+Build the directory with scripts/spatial_deep_zoom/build_deep_zoom.py.
+*/
+if (process.env.SPATIAL_DEEP_ZOOM_DIR) {
+  app.use(
+    "/spatial-deep-zoom",
+    express.static(process.env.SPATIAL_DEEP_ZOOM_DIR, {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith(".dzi")) res.type("application/xml");
+      },
+    })
+  );
+}
+
 // Serve the built index file from url that allows extraction of the base_url and dataset for api calls
 app.get("/:baseUrl/:dataset/", (_, res) => {
   res

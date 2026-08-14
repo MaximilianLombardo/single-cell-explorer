@@ -17,6 +17,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_from_directory,
 )
 from flask_restful import Api, Resource
 from server_timing import Timing as ServerTiming
@@ -37,7 +38,7 @@ from server.common.errors import (
 )
 from server.common.health import health_check
 from server.common.utils.data_locator import DataLocator
-from server.common.utils.http_cache import cache_control, cache_control_always, webbp
+from server.common.utils.http_cache import ONE_YEAR, cache_control, cache_control_always, webbp
 from server.common.utils.utils import Float32JSONEncoder, path_join
 from server.dataset.matrix_loader import DataLoader
 
@@ -202,6 +203,28 @@ class Server:
         if not os.environ.get("SKIP_ATAC_CACHE"):
             preload_gene_data(atac_base_uri=self.atac_base_uri)
             preload_cytoband_data(atac_base_uri=self.atac_base_uri)
+
+        # Serve spatial Deep Zoom tiles locally when SPATIAL_DEEP_ZOOM_DIR is set.
+        #
+        # Upstream uploads these to a CZI S3 bucket at conversion time and the client
+        # fetches them from a hardcoded cellxgene.cziscience.com URL, so a self-hoster
+        # gets no deep zoom at all -- it degrades to the low-resolution image embedded
+        # in the CXG's uns['spatial']. Pointing this at a directory built by
+        # scripts/spatial_deep_zoom/build_deep_zoom.py restores it from our own origin.
+        self.spatial_deep_zoom_dir = os.getenv("SPATIAL_DEEP_ZOOM_DIR")
+        if self.spatial_deep_zoom_dir:
+            deep_zoom_root = os.path.abspath(self.spatial_deep_zoom_dir)
+
+            @self.app.route("/spatial-deep-zoom/<path:asset_path>", methods=["GET"])
+            @cache_control(immutable=True, max_age=ONE_YEAR)
+            def spatial_deep_zoom(asset_path):
+                # send_from_directory rejects traversal outside deep_zoom_root.
+                # .dzi is XML; without an explicit mimetype it is served as
+                # application/octet-stream and the viewer may get a null responseXML.
+                mimetype = "application/xml" if asset_path.endswith(".dzi") else None
+                return send_from_directory(deep_zoom_root, asset_path, mimetype=mimetype)
+
+            logging.info(f"serving spatial deep zoom assets from {deep_zoom_root}")
 
         register_api_v3(
             app=self.app,

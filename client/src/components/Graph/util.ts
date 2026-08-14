@@ -165,23 +165,21 @@ export function getSpatialTileSources(s3URI: string) {
 function getSpatialUrl(s3URI: string) {
   const datasetVersionId = getDatasetVersionId(s3URI);
 
-  const { hostname } = window.location;
+  /*
+  Resolve Deep Zoom tiles from whatever origin is serving this app.
 
-  // TODO(thuang): Take rdev into account
+  Upstream hardcoded cellxgene.cziscience.com, or its staging host for any hostname
+  containing "dev", "staging" or "localhost". Those buckets are not readable outside
+  CZI, so a self-hosted Explorer got no deep zoom at all: the .dzi request failed,
+  isDeepZoomSourceValid flipped to false, and it silently fell back to the
+  low-resolution image embedded in the CXG's uns['spatial'].
 
-  if (
-    /**
-     * (thuang): `dev` env for Explorer is out of sync with Terraform, so don't
-     * use it anymore
-     */
-    hostname.includes("dev") ||
-    hostname.includes("staging") ||
-    hostname.includes("localhost")
-  ) {
-    return `https://cellxgene.staging.single-cell.czi.technology/spatial-deep-zoom/${datasetVersionId}/`;
-  }
-
-  return `https://cellxgene.cziscience.com/spatial-deep-zoom/${datasetVersionId}/`;
+  A same-origin path lets the server decide instead. Set SPATIAL_DEEP_ZOOM_DIR to a
+  directory built by scripts/spatial_deep_zoom/build_deep_zoom.py. If nothing is
+  served there the existing fallback still applies, so this stays safe when no deep
+  zoom assets have been generated.
+  */
+  return `/spatial-deep-zoom/${datasetVersionId}/`;
 }
 
 function getDatasetVersionId(s3URI: string) {
