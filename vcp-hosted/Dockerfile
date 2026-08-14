@@ -1,4 +1,8 @@
-FROM 533267185808.dkr.ecr.us-west-2.amazonaws.com/docker.io/sci/library/ubuntu:22.04
+# Public Ubuntu base. Upstream pulls this same image through CZI's private ECR
+# pull-through cache (533267185808.dkr.ecr.us-west-2.amazonaws.com/docker.io/sci/
+# library/ubuntu:22.04), which is not readable outside CZI, so the image could not
+# be built at all by a self-hoster. Same upstream image, public registry.
+FROM ubuntu:22.04
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
