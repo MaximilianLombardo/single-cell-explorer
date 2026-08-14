@@ -76,7 +76,7 @@ def build_gene_data(url):
             for part in attrs.split(";"):
                 part = part.strip()
                 if part.startswith("gene_name "):
-                    name = part[len("gene_name "):].strip('"')
+                    name = part[len("gene_name ") :].strip('"')
                     break
             if not name:
                 continue
@@ -110,9 +110,7 @@ def build_cytobands(url):
             if len(f) < 5:
                 continue
             chrom, start, end, name, stain = f[0], int(f[1]), int(f[2]), f[3], f[4]
-            bands.setdefault(chrom, []).append(
-                {"start": start, "end": end, "name": name, "stain": stain}
-            )
+            bands.setdefault(chrom, []).append({"start": start, "end": end, "name": name, "stain": stain})
     for chrom in bands:
         bands[chrom].sort(key=lambda b: b["start"])
     total = sum(len(v) for v in bands.values())
@@ -121,11 +119,11 @@ def build_cytobands(url):
 
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__,
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--out", required=True, help="output directory")
-    p.add_argument("--genome", action="append", choices=sorted(GENOMES),
-                   help="genome version (repeatable; default: all)")
+    p.add_argument(
+        "--genome", action="append", choices=sorted(GENOMES), help="genome version (repeatable; default: all)"
+    )
     args = p.parse_args()
 
     genomes = args.genome or sorted(GENOMES)
