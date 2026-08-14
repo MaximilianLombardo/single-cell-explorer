@@ -33,6 +33,12 @@ GitHub only allows API-disabling a workflow that has already registered, so for 
 — which had never fired — editing `on:` was the only way to stop them pre-emptively.
 The original triggers are in git history.
 
+These still show as **active** in the Actions UI, because committing them to the
+default branch is what registers a workflow. That is expected: `workflow_dispatch`
+means they only ever run if someone presses the button. They were left this way rather
+than also API-disabled, so the reason is visible in the file instead of hidden in
+repository settings.
+
 | workflow | why |
 |---|---|
 | `argus-stack-prod-upsert{,-vcp}.yaml` | CZI self-hosted ARM64 runners, CZI AWS accounts |
