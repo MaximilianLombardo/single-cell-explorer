@@ -9,11 +9,8 @@ server:
     flask_secret_key: "asd"
     generate_cache_control_headers: true
     server_timing_headers: true
-    csp_directives:
-      script-src:
-        - browser.sentry-cdn.com
-      connect-src:
-        - sentry.prod.si.czi.technology
+    # csp_directives: add any extra origins this deployment needs. Upstream allowed
+    # CZI's Sentry here; we do not load it.
     disable_auth: true
 
     # if env == "prod":
@@ -75,10 +72,9 @@ default_dataset:
   app:
     # Scripts can be a list of either file names (string) or dicts containing keys src, integrity and crossorigin.
     # these will be injected into the index template as script tags with these attributes set.
-    scripts:
-      - src: "https://browser.sentry-cdn.com/5.15.5/bundle.min.js"
-        integrity: "sha384-wF7Jc4ZlWVxe/L8Ji3hOIBeTgo/HwFuaeEfjGmS3EXAG7Y+7Kjjr91gJpJtr+PAT"
-        crossorigin: "anonymous"
+    # Upstream injected CZI's Sentry bundle here. Removed: it reported to
+    # sentry.prod.si.czi.technology, which we have no access to.
+    scripts: []
 
     # Inline scripts are a list of file names, where the contents of the file will be injected into the index.
     # inline_scripts:

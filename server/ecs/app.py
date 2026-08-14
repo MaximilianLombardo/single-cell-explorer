@@ -37,25 +37,15 @@ class WSGIServer(Server):
             parse_api_base_url = urlparse(api_base_url)
             extra_connect_src = [f"{parse_api_base_url.scheme}://{parse_api_base_url.netloc}"]
 
-        PLAUSIBLE_URL = "https://plausible.io"
-
-        HUBSPOT_JS_URL = "https://js.hsforms.net"
-
-        HUBSPOT_FORMS_URL = "https://forms.hsforms.com"
-
-        HUBSPOT_FORMS_URL_CDN = "https://forms-na1.hsforms.com"
-
         EXPLORER_DEV_URL = "https://cellxgene.dev.single-cell.czi.technology"
 
         EXPLORER_STAGING_URL = "https://cellxgene.staging.single-cell.czi.technology"
 
         csp = {
-            "default-src": ["'self'", HUBSPOT_FORMS_URL, HUBSPOT_JS_URL],
-            "form-action": ["'self'", HUBSPOT_FORMS_URL],
+            "default-src": ["'self'"],
+            "form-action": ["'self'"],
             "connect-src": [
                 "'self'",
-                PLAUSIBLE_URL,
-                HUBSPOT_FORMS_URL,
                 EXPLORER_DEV_URL,
                 EXPLORER_STAGING_URL,
             ]
@@ -63,9 +53,6 @@ class WSGIServer(Server):
             "script-src": [
                 "'self'",
                 "'unsafe-eval'",
-                PLAUSIBLE_URL,
-                HUBSPOT_FORMS_URL,
-                HUBSPOT_JS_URL,
             ]
             + script_hashes,
             "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
@@ -75,10 +62,9 @@ class WSGIServer(Server):
                 "https://cellxgene.cziscience.com",
                 EXPLORER_DEV_URL,
                 EXPLORER_STAGING_URL,
-                HUBSPOT_FORMS_URL_CDN,
             ]
             + extra_connect_src
-            + ["data:", HUBSPOT_FORMS_URL],
+            + ["data:"],
             "object-src": ["'none'"],
             "base-uri": ["'none'"],
             "frame-ancestors": ["'none'"],

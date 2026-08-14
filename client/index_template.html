@@ -45,13 +45,6 @@
       crossorigin="anonymous"
     />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <script>
-      var script = document.createElement('script')
-      script.defer=true
-      script.dataset.domain=window.location.host // Set script data-domain dynamically
-      script.src = "https://plausible.io/js/plausible.js"
-      document.head.append(script)
-    </script>
   </head>
   <body>
     <script type="text/javascript">
@@ -85,11 +78,6 @@
       data-template="<%= OBSOLETE_TEMPLATE %>"
       data-regex="<%= OBSOLETE_REGEX %>"
     ></script>
-    <!-- Hubspot -->
-    <script>
-      var _hsq = (window._hsq = window._hsq || []);
-      _hsq.push(["doNotTrack"]);
-    </script>
     {% for script in SCRIPTS -%}
     <script type="text/javascript"
       {{ ('integrity="%s"' % script.integrity) | safe if script.integrity }}

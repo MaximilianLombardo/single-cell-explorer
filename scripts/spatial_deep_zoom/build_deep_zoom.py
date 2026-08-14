@@ -81,6 +81,30 @@ def to_uint8_image(arr):
     return Image.fromarray(arr, mode="RGB")
 
 
+def crop_and_flip(img):
+    """Match the geometry the client expects, exactly as the converter produces it.
+
+    SpatialDataProcessor._process_and_flip_image does two things before handing the
+    image to dzsave, and the spot overlay is positioned assuming both:
+
+      1. a CENTRE SQUARE CROP (_calculate_aspect_ratio_crop) to min(width, height);
+      2. a VERTICAL FLIP, because the Explorer client renders images upside down.
+
+    Skipping either misaligns the Visium spots against the tissue -- the flip shows
+    up as the spots being mirrored top-to-bottom relative to the histology.
+
+    For the example dataset this reproduces the crop_coords already recorded in
+    uns['spatial'][*]['image_properties'] -- (0, 22, 1955, 1977) for a 1955x2000
+    source.
+    """
+    width, height = img.size
+    side = min(width, height)
+    left = (width - side) // 2
+    upper = (height - side) // 2
+    cropped = img.crop((left, upper, left + side, upper + side))
+    return cropped.transpose(Image.FLIP_TOP_BOTTOM)
+
+
 def write_dzi(img, out_dir, basename="spatial"):
     """Write a DZI descriptor plus the tile pyramid for `img`."""
     width, height = img.size
@@ -139,7 +163,9 @@ def main():
 
     print(f"reading {cxg}")
     img = to_uint8_image(load_spatial_image(cxg))
-    print(f"  image {img.size[0]}x{img.size[1]}")
+    print(f"  source image {img.size[0]}x{img.size[1]}")
+    img = crop_and_flip(img)
+    print(f"  after centre-square crop + vertical flip: {img.size[0]}x{img.size[1]}")
 
     w, h, levels, n = write_dzi(img, out_dir)
     total = sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(out_dir) for f in fs)

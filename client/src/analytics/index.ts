@@ -10,20 +10,23 @@ declare global {
   }
 }
 
-export function track(event: EVENTS, props?: Record<string, unknown>): void {
-  const options = props ? { props } : undefined;
+/*
+Analytics are disabled on this fork -- this is deliberately a no-op.
 
-  /**
-   * (thuang): Log analytics events for debugging purposes
-   * Please comment out before committing
-   */
-  // console.log("track", event, options);
+Upstream sent every event to CZI's Plausible instance. The script tag that loaded
+plausible.js has been removed from index_template.html, so `window.plausible` was
+undefined here and every call threw a TypeError that the old try/catch swallowed into
+console.error. Nothing was reported, but every interaction logged an error.
 
-  try {
-    window.plausible(event, options);
-  } catch (error) {
-    console.error(error);
-  }
+The ~29 call sites are left in place on purpose: they mark the points someone
+already decided are worth instrumenting, which is useful if we ever add our own
+analytics. To do that, implement this function and add the corresponding
+script-src/connect-src entries to the CSP in server/ecs/app.py.
+*/
+// underscore-prefixed so noUnusedParameters accepts them; the signature is kept
+// intact so the ~29 call sites need no change.
+export function track(_event: EVENTS, _props?: Record<string, unknown>): void {
+  // intentionally empty
 }
 
 export function trackColorByCategoryExpand(
