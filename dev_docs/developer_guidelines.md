@@ -119,6 +119,18 @@ You can set these environment variables manually with the `export` shell command
 | I want to only run smoke tests.                                       | `make smoke-test`          |
 | I want to run smoke tests against my hot-loaded verion of the client. | `cd client && npm run e2e` |
 
+Frontend unit tests (everything under `__tests__` except `__tests__/e2e`) run as the
+`unit` Playwright project. They use the `@playwright/test` API but launch no browser,
+so they finish in ~20s. `make unit-test-client` and `cd client && npm run test` are
+equivalent.
+
+**12 of these currently fail, and they are not app regressions.** The suite was
+migrated from Jest to `@playwright/test` but never wired into a Playwright project, so
+nothing ran it and the assertion-semantics differences went unnoticed. Most failures
+are `toMatchObject` against a `Map`, or `toEqual` comparing a `TypedArray` to a plain
+`Array` ("serializes to the same string"). Confirm which bucket a failure is in before
+treating it as a live bug.
+
 ### Flags
 
 1. `JEST_ENV`: This enables the following E2E test options. You can find their corresponding configs in [`jest-puppeteer.config.js`](../client/jest-puppeteer.config.js):

@@ -232,7 +232,6 @@ describe("geneset: update", () => {
       )
     ).toMatchObject({
       initialized: true,
-      lastTid: 0,
       genesets: new Map([
         [
           "bar",

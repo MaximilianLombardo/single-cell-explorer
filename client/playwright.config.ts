@@ -126,6 +126,20 @@ export default defineConfig<ChromaticConfig>({
 
   /* Configure projects for major browsers */
   projects: [
+    /**
+     * Pure unit tests (crossfilter, dataframe, reducers, util). These already use
+     * the @playwright/test API but matched no project, so nothing ran them -- see
+     * `npm run test`. They touch no browser fixture, so no browser is launched.
+     * Retries are disabled: unlike e2e, a flaky unit test is a bug to fix, not to
+     * paper over.
+     */
+    {
+      name: "unit",
+      testMatch: ["**/*.test.ts"],
+      testIgnore: ["**/e2e/**"],
+      retries: 0,
+      timeout: 30 * 1000,
+    },
     {
       name: "chromium",
       testMatch: [

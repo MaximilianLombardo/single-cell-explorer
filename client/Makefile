@@ -57,9 +57,13 @@ data-persistence-smoke-tests:
 		$(CXG_SERVER_PORT) \
 		'CXG_URL_BASE="http://localhost:$(CXG_SERVER_PORT)" npm run e2e -- --project=vcp-deployment'
 
+# Jest was removed from the dependencies but this target still invoked it, so
+# `make unit-test-client` failed outright and the 21 non-e2e test files went
+# unrun. They already use the @playwright/test API, so they run as a Playwright
+# project -- no browser is launched. See the "unit" project in playwright.config.ts.
 .PHONY: unit-test
 unit-test:
-	node node_modules/jest/bin/jest.js --testPathIgnorePatterns e2e
+	npm run test
 
 # pass remaining commands through to npm run
 %:

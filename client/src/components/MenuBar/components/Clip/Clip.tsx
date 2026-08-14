@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   ButtonGroup,
   Icon,
   Intent,
@@ -15,6 +14,14 @@ import { tooltipHoverOpenDelay } from "~/globals";
 // @ts-expect-error ts-migrate(2307) FIXME: Cannot find module './menubar.css' or its correspo... Remove this comment to see the full error message
 import styles from "../../menubar.css";
 import { ClipProps } from "./types";
+import {
+  ClipCommitButton,
+  ClipPopoverContent,
+  ClipRangeRow,
+  ClipRangeSeparator,
+  ClipTriggerButton,
+  PercentageIconWrapper,
+} from "./style";
 
 function Clip(props: ClipProps) {
   const {
@@ -53,14 +60,11 @@ function Clip(props: ClipProps) {
             position="bottom"
             hoverOpenDelay={tooltipHoverOpenDelay}
           >
-            <Button
+            <ClipTriggerButton
               type="button"
               data-testid="visualization-settings"
               intent={intent}
               icon={IconNames.TIMELINE_BAR_CHART}
-              style={{
-                cursor: "pointer",
-              }}
               ref={tooltipRef}
               {...tooltipProps}
             />
@@ -70,26 +74,13 @@ function Clip(props: ClipProps) {
         onOpening={handleClipOpening}
         onClosing={handleClipClosing}
         content={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
-              flexDirection: "column",
-              padding: 10,
-            }}
-          >
+          <ClipPopoverContent>
             <div>Clip all continuous values to percentile range</div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingTop: 5,
-                paddingBottom: 5,
-              }}
-            >
+            <ClipRangeRow>
               <NumericInput
+                // Blueprint routes `className` to the outer ControlGroup but
+                // `style` to the inner <input>, so this width cannot move to
+                // style.ts without changing which element it sizes.
                 style={{ width: 50 }}
                 data-testid="clip-min-input"
                 onValueChange={handleClipPercentileMinValueChange}
@@ -102,13 +93,14 @@ function Clip(props: ClipProps) {
                 fill={false}
                 minorStepSize={null}
                 rightElement={
-                  <div style={{ padding: "4px 2px" }}>
+                  <PercentageIconWrapper>
                     <Icon icon="percentage" intent="primary" size={14} />
-                  </div>
+                  </PercentageIconWrapper>
                 }
               />
-              <span style={{ marginRight: 5, marginLeft: 5 }}> - </span>
+              <ClipRangeSeparator> - </ClipRangeSeparator>
               <NumericInput
+                // See note on the min input above.
                 style={{ width: 50 }}
                 data-testid="clip-max-input"
                 onValueChange={handleClipPercentileMaxValueChange}
@@ -121,27 +113,22 @@ function Clip(props: ClipProps) {
                 fill={false}
                 minorStepSize={null}
                 rightElement={
-                  <div style={{ padding: "4px 2px" }}>
+                  <PercentageIconWrapper>
                     <Icon icon="percentage" intent="primary" size={14} />
-                  </div>
+                  </PercentageIconWrapper>
                 }
               />
-              <Button
+              <ClipCommitButton
                 type="button"
                 data-testid="clip-commit"
                 intent="primary"
                 disabled={isClipDisabled()}
-                style={{
-                  cursor: "pointer",
-                  marginRight: 5,
-                  marginLeft: 5,
-                }}
                 onClick={handleClipCommit}
               >
                 Clip
-              </Button>
-            </div>
-          </div>
+              </ClipCommitButton>
+            </ClipRangeRow>
+          </ClipPopoverContent>
         }
       />
     </ButtonGroup>

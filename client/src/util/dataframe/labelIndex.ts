@@ -88,8 +88,9 @@ export class IdentityInt32Index extends LabelIndexBase {
   }
 
   getOffset(label: LabelType): number {
-    // label to offset
-    return typeof label === "number" && label >= 0 && label < this.maxOffset
+    // label to offset.  Labels are int32, so non-integer numbers (eg, 0.001)
+    // are not legal labels and must be rejected.
+    return Number.isInteger(label) && label >= 0 && label < this.maxOffset
       ? (label as number)
       : -1;
   }
