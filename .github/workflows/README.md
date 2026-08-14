@@ -41,17 +41,15 @@ repository settings.
 
 | workflow | why |
 |---|---|
-| `argus-stack-prod-upsert{,-vcp}.yaml` | CZI self-hosted ARM64 runners, CZI AWS accounts |
-| `argus-stack-rdev-create{,-vcp}.yaml` | same |
-| `argus-stack-rdev-delete{,-vcp}.yaml` | same |
-| `argus-stack-staging-upsert{,-vcp}.yaml` | same |
+| `argus-stack-prod-upsert.yaml` | CZI self-hosted ARM64 runners, CZI AWS accounts |
+| `argus-stack-rdev-create.yaml` | same |
+| `argus-stack-rdev-delete.yaml` | same |
+| `argus-stack-staging-upsert.yaml` | same |
 | `helm-lint-single-cell-explorer.yaml` | lints Argus charts targeting CZI-owned ECR |
-| `helm-lint-vcp-explorer.yaml` | same |
-| `scale-test.yml` | locust against CZI dev infrastructure |
 
 ## The ARM64 trap
 
-Ten of these workflows specify `runs-on: ARM64` — a **self-hosted runner label**, not
+Several of these workflows specify `runs-on: ARM64` — a **self-hosted runner label**, not
 a GitHub-hosted one. Without a matching runner a job does not fail, it **queues
 forever**: no result, no notification, and `concurrency.cancel-in-progress` means each
 new push silently cancels the last. That is why it went unnoticed until the workflow

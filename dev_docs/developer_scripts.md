@@ -46,7 +46,7 @@ Installs requirements files.
 
 **Requires**
 
-- The server to be running. Best way to do this is with [backend_dev](#backend_dev).
+- The server to be running: `./launch_dev_server.sh <directory of .cxg datasets>`.
 - `make ci` to install the necessary node modules
 
 **Usage:** from the `$PROJECT_ROOT/client` directory run `make start-frontend`
@@ -55,33 +55,6 @@ NB: the frontend server reads in the desired base_url and dataset name to form t
 order to use an arbitrary dataset successfully, the frontend server must be started **after** the backend server\*, which
 writes out the given base_url and dataset anew each time.
 
-#### backend_dev
-
-**About** This script enables FE developers to run the REST API necessary to
-back the development server for the front end. It is intended to ensure that
-the FE developer gets the current version of the backend with a single command
-and no knowledge of python necessary. It creates and activates a virtual
-environment and installs explorer requirements from the current branch.
-
-**Requires** `Python3.10+`, `virtual-env`, `pip`
-
-**Usage:** from the `$PROJECT_ROOT` directory run `./scripts/backend_dev`
-
-**Options:**
-
-- In parallel, you can then launch the node development server to serve the
-  current state of the FE with [`start-frontend`](#start-frontend), usually in
-  a different terminal tab.
-- You can use a specific dataroot using `./launch_dev_server.sh <custom_dataroot>`.
-- You can also pass (current/desktop/legacy) cli options to the `./launch_dev_server.sh` command.
-
-**Breakdown**
-
-| command                              | purpose                                           |
-| ------------------------------------ | ------------------------------------------------- |
-| python3.12 -m venv explorer          | creates explorer virtual environment              |
-| source explorer/bin/activate         | activates virtual environment                     |
-| ./launch_dev_server.sh [cli options] | launches api server (can supply arbitrary config) |
 
 ### Client test scripts
 
