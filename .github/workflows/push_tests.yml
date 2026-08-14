@@ -1,9 +1,12 @@
 name: Push Tests
 
 on:
+  # Runs on every branch, not just main. Upstream relied on PRs to trigger this, but
+  # a solo fork pushes directly to feature branches most of the time, which matched
+  # neither trigger and meant no CI ran at all.
   push:
     branches:
-      - main
+      - "**"
   pull_request:
     branches:
       - "**"
