@@ -110,7 +110,11 @@ jobs:
       - name: Unit tests
         run: |
           make unit-test-server
+      # Skipped unless a CODECOV_TOKEN secret is configured. Without one the action
+      # fails and takes the whole job red even when every test passed, which buries
+      # the signal we actually care about.
       - name: Upload coverage reports to Codecov with GitHub Action
+        if: env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v4.2.0
         with:
           root_dir: ../
