@@ -1,8 +1,11 @@
 name: "Scale test cellxgene APIs for initial loading"
 
+# DISABLED ON THIS FORK: runs locust against CZI dev infrastructure.
+# Trigger reduced to manual dispatch so it does not fire automatically. Restore the
+# original `on:` block (see git history) once there is equivalent infrastructure of
+# our own to deploy to.
 on:
-  schedule:
-    - cron: "0 0 * * Sun"
+  workflow_dispatch:
 
 jobs:
   locust-build:

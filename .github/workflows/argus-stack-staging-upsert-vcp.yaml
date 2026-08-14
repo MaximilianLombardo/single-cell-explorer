@@ -1,7 +1,11 @@
 name: Update staging VCP
 
+# DISABLED ON THIS FORK: needs CZI self-hosted ARM64 runners and CZI AWS accounts.
+# Trigger reduced to manual dispatch so it does not fire automatically. Restore the
+# original `on:` block (see git history) once there is equivalent infrastructure of
+# our own to deploy to.
 on:
-  - pull_request
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

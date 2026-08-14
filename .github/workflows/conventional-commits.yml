@@ -14,6 +14,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   conventional_commit_title:
-    runs-on: ARM64
+    # Was `runs-on: ARM64`, a CZI self-hosted runner label. No such runner exists on
+    # this fork, so the job would sit queued indefinitely rather than fail -- worse
+    # than failing, because nothing ever reports a result. The action itself is a
+    # public one and runs fine on a GitHub-hosted runner.
+    runs-on: ubuntu-latest
     steps:
       - uses: chanzuckerberg/github-actions/.github/actions/conventional-commits@v2.13.0

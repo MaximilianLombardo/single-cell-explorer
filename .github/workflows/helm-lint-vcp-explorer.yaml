@@ -1,7 +1,11 @@
 name: "Lint argus helm chart - vcp-explorer"
 
+# DISABLED ON THIS FORK: lints CZI Argus charts that target CZI-owned ECR.
+# Trigger reduced to manual dispatch so it does not fire automatically. Restore the
+# original `on:` block (see git history) once there is equivalent infrastructure of
+# our own to deploy to.
 on:
-  - pull_request
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
