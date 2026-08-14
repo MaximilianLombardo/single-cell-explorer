@@ -55,3 +55,8 @@ html-reports/
 playwright-report/
 blob-report/
 playwright/.cache/
+
+# User-annotation directories written into the CXG fixtures by the server unit tests
+# (server/tests/unit/.../test_user_annotations). Regenerated on every run.
+server/tests/fixtures/*.cxg/*-user-*/
+server/tests/fixtures/*.cxg/test-user-*/
