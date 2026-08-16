@@ -199,6 +199,8 @@ export const scatterplotMarginLeft = 11;
 /* 52px nav / 260px metadata panel / fluid canvas / 260px genes panel */
 export const rightSidebarWidth = 260;
 export const leftSidebarWidth = 260;
+/* panel collapse/expand animation duration */
+export const sidebarTransitionMs = 220;
 export const leftSidebarSectionHeading = {
   fontSize: 11,
   textTransform: "uppercase",

@@ -34,10 +34,16 @@ function Layout({ children, addTopPadding, renderGraph = undefined }: Props) {
   }
   const leftWidth = leftCollapsed ? RAIL_WIDTH_PX : globals.leftSidebarWidth;
   const rightWidth = rightCollapsed ? RAIL_WIDTH_PX : globals.rightSidebarWidth;
+  const reduceMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   return (
     <div
       style={{
         display: "grid",
+        transition: reduceMotion
+          ? undefined
+          : `grid-template-columns ${globals.sidebarTransitionMs}ms ease`,
         paddingTop: addTopPadding ? globals.HEADER_HEIGHT_PX : 0,
         gridTemplateColumns: `
         [left-sidebar-start] ${leftWidth + 1}px

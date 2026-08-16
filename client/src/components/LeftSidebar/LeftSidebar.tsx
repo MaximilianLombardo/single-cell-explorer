@@ -5,10 +5,12 @@ import { IconNames } from "@blueprintjs/icons";
 
 import { RootState } from "reducers";
 import PanelRail from "common/components/PanelRail/PanelRail";
+import * as globals from "~/globals";
 import Categorical from "./components/Categorical/Categorical";
 import Continuous from "./components/Continuous/Continuous";
 import {
   CollapseToggle,
+  RailSlot,
   DatasetLabel,
   DatasetName,
   DatasetRow,
@@ -52,21 +54,19 @@ function LeftSideBar() {
 
   const toggle = () => {
     dispatch({ type: "sidebar: toggle left" });
-    /* nudge the graph to re-measure its viewport */
-    setTimeout(() => window.dispatchEvent(new Event("resize")), 0);
-  };
-
-  if (collapsed) {
-    return (
-      <LeftSidebarWrapper>
-        <PanelRail label="Metadata" side="left" onExpand={toggle} />
-      </LeftSidebarWrapper>
+    /* re-measure the graph once the panel animation settles */
+    setTimeout(
+      () => window.dispatchEvent(new Event("resize")),
+      globals.sidebarTransitionMs + 30
     );
-  }
+  };
 
   return (
     <LeftSidebarWrapper>
-      <LeftSidebarContainer>
+      <RailSlot visible={collapsed}>
+        <PanelRail label="Metadata" side="left" onExpand={toggle} />
+      </RailSlot>
+      <LeftSidebarContainer visible={!collapsed}>
         <PanelHeader>
           <CollapseToggle
             type="button"

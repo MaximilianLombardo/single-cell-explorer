@@ -7,12 +7,35 @@ export const LeftSidebarWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
+  position: relative;
 `;
 
-export const LeftSidebarContainer = styled.div`
+/* Content keeps its full width while the grid column animates, so the panel
+   clips instead of reflowing; opacity crossfades against the rail. */
+export const LeftSidebarContainer = styled.div<{ visible: boolean }>`
   height: 100%;
   width: ${globals.leftSidebarWidth}px;
   overflow-y: auto;
+  opacity: ${(props) => (props.visible ? 1 : 0)};
+  pointer-events: ${(props) => (props.visible ? "auto" : "none")};
+  transition: opacity ${globals.sidebarTransitionMs}ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+`;
+
+export const RailSlot = styled.div<{ visible: boolean }>`
+  inset: 0;
+  opacity: ${(props) => (props.visible ? 1 : 0)};
+  pointer-events: ${(props) => (props.visible ? "auto" : "none")};
+  position: absolute;
+  transition: opacity ${globals.sidebarTransitionMs}ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 `;
 
 export const PanelHeader = styled.div`
