@@ -23,6 +23,42 @@ export const MenuBarWrapper = styled.div`
   width: 100%;
   position: relative;
   container: menu-bar / inline-size;
+
+  /* Rail controls are exact 26px instrument squares; buttons that carry a
+     text label (embedding value, cell-set counts) keep horizontal padding. */
+  .bp5-button {
+    min-height: 26px;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+  }
+
+  .bp5-button:not(:has(.bp5-button-text)) {
+    height: 26px;
+    padding: 0;
+    width: 26px;
+  }
+
+  .bp5-button .bp5-icon {
+    color: ${globals.fgSecondary};
+  }
+
+  .bp5-button.bp5-active .bp5-icon,
+  .bp5-button:active .bp5-icon,
+  .bp5-button.bp5-intent-primary .bp5-icon {
+    color: #ffffff;
+  }
+
+  .bp5-button:disabled .bp5-icon,
+  .bp5-button.bp5-disabled .bp5-icon {
+    color: #b8bfc6;
+  }
+
+  /* rail toggles read as ink-filled squares when engaged, per the reference */
+  .bp5-button.bp5-intent-primary {
+    background-color: ${globals.fgPrimary};
+    border-color: ${globals.fgPrimary};
+  }
 `;
 
 export const ResponsiveMenuGroupOne = styled.div`

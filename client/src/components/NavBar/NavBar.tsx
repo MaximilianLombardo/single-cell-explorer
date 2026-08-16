@@ -7,26 +7,17 @@ import {
   Position,
   Popover,
 } from "@blueprintjs/core";
-import { useSelector } from "react-redux";
-import { RootState } from "reducers";
 import { IconNames as CXGIconNames } from "../icon";
 import { track } from "../../analytics";
 import { EVENTS } from "../../analytics/events";
 import { ROUTES } from "./routes";
 import Icon from "../icon/icon";
 import {
-  BetaChip,
-  CellCountBox,
-  DatasetLabel,
-  DatasetName,
   HelpWrapper,
   IdentityBox,
   Left,
-  LinkWrapper,
   MainWrapper,
   Right,
-  SegmentedNav,
-  Wordmark,
   Wrapper,
 } from "./style";
 
@@ -36,14 +27,6 @@ function handleMenuClick() {
 
 const CENSUS_DOCS_LINK = "https://cellxgene-census.readthedocs.io/en/latest";
 
-/* Fall back to the dataset segment of the URL when portal metadata is absent
-   (self-hosted deployments have no data portal to supply a display name). */
-function datasetNameFromPath(): string {
-  const segments = window.location.pathname.split("/").filter(Boolean);
-  const cxg = segments.find((s) => s.toLowerCase().endsWith(".cxg"));
-  return cxg ?? segments[segments.length - 1] ?? "";
-}
-
 interface HeaderProps {
   tosURL?: string;
   privacyURL?: string;
@@ -52,58 +35,17 @@ interface HeaderProps {
 function Header(props: HeaderProps) {
   const { tosURL, privacyURL } = props;
 
-  const datasetName = useSelector(
-    (state: RootState) =>
-      state.datasetMetadata?.datasetMetadata?.dataset_name ??
-      datasetNameFromPath()
-  );
-  const cellCount = useSelector(
-    (state: RootState) => state.annoMatrix?.schema?.dataframe?.nObs
-  );
-
   return (
     <Wrapper data-testid="header">
       <MainWrapper>
         <Left>
           <a href={ROUTES.HOMEPAGE}>
             <IdentityBox>
-              <span>CELL&times;GENE</span>
+              <span>Explorer</span>
             </IdentityBox>
           </a>
-          <Wordmark>EXPLORER</Wordmark>
         </Left>
-        <SegmentedNav>
-          <LinkWrapper>
-            <AnchorButton active minimal text="Explore" />
-          </LinkWrapper>
-          <LinkWrapper>
-            <AnchorButton
-              active={false}
-              href={ROUTES.WHERE_IS_MY_GENE}
-              minimal
-              text="Gene Expression"
-              onClick={handleWMGClick}
-            />
-          </LinkWrapper>
-          <LinkWrapper>
-            <AnchorButton
-              active={false}
-              href={ROUTES.DE}
-              minimal
-              text="Differential Expression"
-              onClick={handleDEClick}
-            />
-            <BetaChip label="New" size="small" />
-          </LinkWrapper>
-        </SegmentedNav>
         <Right>
-          <DatasetLabel>Dataset</DatasetLabel>
-          <DatasetName title={datasetName}>{datasetName}</DatasetName>
-          {cellCount ? (
-            <CellCountBox>
-              <span>{cellCount.toLocaleString()} cells</span>
-            </CellCountBox>
-          ) : null}
           <HelpWrapper>
             <Popover
               hasBackdrop
@@ -157,6 +99,16 @@ function Header(props: HeaderProps) {
                     href={ROUTES.DATASETS}
                     text="Datasets"
                     onClick={handleDatasetsClick}
+                  />
+                  <MenuItem
+                    href={ROUTES.WHERE_IS_MY_GENE}
+                    text="Gene Expression"
+                    onClick={handleWMGClick}
+                  />
+                  <MenuItem
+                    href={ROUTES.DE}
+                    text="Differential Expression"
+                    onClick={handleDEClick}
                   />
                   <MenuItem
                     href={ROUTES.CELL_GUIDE}

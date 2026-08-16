@@ -5,6 +5,9 @@ import { RootState } from "reducers";
 import Categorical from "./components/Categorical/Categorical";
 import Continuous from "./components/Continuous/Continuous";
 import {
+  DatasetLabel,
+  DatasetName,
+  DatasetRow,
   LeftSidebarContainer,
   LeftSidebarWrapper,
   PanelEyebrow,
@@ -15,7 +18,20 @@ import {
   PanelScopeMuted,
 } from "./style";
 
+/* Fall back to the dataset segment of the URL when portal metadata is absent
+   (self-hosted deployments have no data portal to supply a display name). */
+function datasetNameFromPath(): string {
+  const segments = window.location.pathname.split("/").filter(Boolean);
+  const cxg = segments.find((s) => s.toLowerCase().endsWith(".cxg"));
+  return cxg ?? segments[segments.length - 1] ?? "";
+}
+
 function LeftSideBar() {
+  const datasetName = useSelector(
+    (state: RootState) =>
+      state.datasetMetadata?.datasetMetadata?.dataset_name ??
+      datasetNameFromPath()
+  );
   const nObs = useSelector(
     (state: RootState) => state.annoMatrix?.schema?.dataframe?.nObs
   );
@@ -30,6 +46,10 @@ function LeftSideBar() {
     <LeftSidebarWrapper>
       <LeftSidebarContainer>
         <PanelHeader>
+          <DatasetRow>
+            <DatasetLabel>Dataset</DatasetLabel>
+            <DatasetName title={datasetName}>{datasetName}</DatasetName>
+          </DatasetRow>
           <PanelEyebrow>Metadata</PanelEyebrow>
           <PanelHeading>Annotations</PanelHeading>
           {nObs ? (

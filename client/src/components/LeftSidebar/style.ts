@@ -20,6 +20,35 @@ export const PanelHeader = styled.div`
   padding: 12px ${globals.leftSidebarSectionPadding}px 10px;
 `;
 
+export const DatasetRow = styled.div`
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+`;
+
+export const DatasetLabel = styled.span`
+  color: ${globals.fgMuted};
+  font-family: ${globals.fontMonoCaps};
+  font-size: 9px;
+  font-weight: ${globals.bolder};
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+`;
+
+export const DatasetName = styled.span`
+  color: ${globals.fgPrimary};
+  font-family: ${globals.fontMonoData};
+  font-size: 11px;
+  font-weight: ${globals.bolder};
+  letter-spacing: 0.02em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+`;
+
 export const PanelEyebrow = styled.div`
   color: ${globals.fgSecondary};
   font-family: ${globals.fontMonoCaps};
