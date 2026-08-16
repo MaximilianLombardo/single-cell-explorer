@@ -160,6 +160,24 @@ async function datasetUnsMetadataFetchAndLoad(
   }
 }
 
+/**
+ * Fetches the dataset's prediction declarations (uns["predictions"]), the
+ * manifest the annotation pipeline writes to name its annotation and
+ * confidence obs columns. Absence is normal — most datasets are undeclared.
+ */
+async function predictionsFetchAndLoad(dispatch: AppDispatch): Promise<void> {
+  let declarations: unknown = [];
+  try {
+    declarations = await fetchJson<unknown>(`uns/meta?key=predictions`);
+  } catch (e) {
+    /* undeclared dataset — fall through with an empty manifest */
+  }
+  dispatch({
+    type: "predictions: load success",
+    declarations: Array.isArray(declarations) ? declarations : [],
+  });
+}
+
 interface GeneInfoAPI {
   ncbi_url: string;
   name: string;
@@ -280,6 +298,7 @@ const doInitialDataLoad = (): ((
 
       await datasetMetadataFetchAndLoad(dispatch, oldPrefix, config);
       await datasetUnsMetadataFetchAndLoad(dispatch, "spatial");
+      await predictionsFetchAndLoad(dispatch);
       await fetchCellTypesList(dispatch);
 
       const baseDataUrl = `${globals.API.prefix}${globals.API.version}`;

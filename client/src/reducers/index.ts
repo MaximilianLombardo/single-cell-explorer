@@ -30,6 +30,8 @@ import panelEmbedding from "./panelEmbedding";
 import autosave from "./autosave";
 import annotations from "./annotations";
 import annotationMetadata from "./annotationMetadata";
+import predictions from "./predictions";
+import sidebarPanels from "./sidebarPanels";
 
 import { gcMiddleware as annoMatrixGC } from "../annoMatrix";
 
@@ -58,6 +60,8 @@ const AppReducer = undoable(
     ["annotations", annotations],
     ["annotationMetadata", annotationMetadata],
     ["autosave", autosave],
+    ["predictions", predictions],
+    ["sidebarPanels", sidebarPanels],
   ] as Parameters<typeof cascadeReducers>[0]),
   [
     "annoMatrix",
@@ -115,6 +119,8 @@ export interface RootState {
   annotations: ReturnType<typeof annotations>;
   annotationMetadata: ReturnType<typeof annotationMetadata>;
   autosave: ReturnType<typeof autosave>;
+  predictions: ReturnType<typeof predictions>;
+  sidebarPanels: ReturnType<typeof sidebarPanels>;
 }
 
 export type AppDispatch = ThunkDispatch<RootState, never, AnyAction>;

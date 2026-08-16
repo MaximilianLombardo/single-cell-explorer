@@ -1,4 +1,7 @@
 import React, { Children, ReactNode, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "reducers";
+import { RAIL_WIDTH_PX } from "common/components/PanelRail/PanelRail";
 import * as globals from "../../globals";
 
 interface Props {
@@ -20,23 +23,26 @@ interface Props {
 
 function Layout({ children, addTopPadding, renderGraph = undefined }: Props) {
   const [viewportRef, setViewportRef] = useState<HTMLDivElement | null>(null);
+  const { leftCollapsed, rightCollapsed } = useSelector(
+    (state: RootState) => state.sidebarPanels
+  );
   const [leftSidebar, rightSidebar, ...restChildren] =
     Children.toArray(children);
   let graphComponent = null;
   if (viewportRef && renderGraph) {
     graphComponent = renderGraph(viewportRef);
   }
+  const leftWidth = leftCollapsed ? RAIL_WIDTH_PX : globals.leftSidebarWidth;
+  const rightWidth = rightCollapsed ? RAIL_WIDTH_PX : globals.rightSidebarWidth;
   return (
     <div
       style={{
         display: "grid",
         paddingTop: addTopPadding ? globals.HEADER_HEIGHT_PX : 0,
         gridTemplateColumns: `
-        [left-sidebar-start] ${globals.leftSidebarWidth + 1}px
+        [left-sidebar-start] ${leftWidth + 1}px
         [left-sidebar-end graph-start] auto
-        [graph-end right-sidebar-start] ${
-          globals.rightSidebarWidth + 1
-        }px [right-sidebar-end]
+        [graph-end right-sidebar-start] ${rightWidth + 1}px [right-sidebar-end]
       `,
         gridTemplateRows: "[top] auto [bottom]",
         gridTemplateAreas: "left-sidebar | graph | right-sidebar",

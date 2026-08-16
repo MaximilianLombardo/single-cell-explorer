@@ -28,6 +28,7 @@ interface CategoricalState {
   createCategoryDialogOpen: boolean;
   newCategoryName: string;
   categoryToDuplicate: string | null;
+  showHiddenCategories: boolean;
 }
 
 class Categorical extends React.Component<Props, CategoricalState> {
@@ -37,6 +38,7 @@ class Categorical extends React.Component<Props, CategoricalState> {
       createCategoryDialogOpen: false,
       newCategoryName: "",
       categoryToDuplicate: null,
+      showHiddenCategories: false,
     };
   }
 
@@ -174,45 +176,55 @@ class Categorical extends React.Component<Props, CategoricalState> {
       expandedCategories,
       writableCategoriesEnabled,
       writableGenesetsEnabled,
-      isVcpDeployment,
+      predictions,
     } = this.props;
 
     const isTest = getFeatureFlag(FEATURES.TEST);
-    const { createCategoryDialogOpen, newCategoryName, categoryToDuplicate } =
-      this.state;
+    const {
+      createCategoryDialogOpen,
+      newCategoryName,
+      categoryToDuplicate,
+      showHiddenCategories,
+    } = this.state;
 
-    /* Names for categorical, string and boolean types, sorted in display order.  Will be rendered in this order */
-    const selectableCategoryNames = ControlsHelpers.selectableCategoryNames(
-      schema
-    )
-      .filter((catName) => !this.isCategoryNameOntologyKey(catName)) // Ontology keys are not selectable
-      .sort();
+    const allSelectableNames =
+      ControlsHelpers.selectableCategoryNames(schema).sort();
+
+    /* Ontology-ID twins and their kin are hidden by default, but recoverable */
+    const hiddenCategoryNames = allSelectableNames.filter(
+      (catName) =>
+        this.isCategoryNameOntologyKey(catName) &&
+        !this.isCategoryNameExcluded(catName) &&
+        this.isCategoryDisplayable(schema, catName)
+    );
+
+    const selectableCategoryNames = allSelectableNames.filter(
+      (catName) => !this.isCategoryNameOntologyKey(catName)
+    );
 
     const categoryNameError = this.categoryNameError(newCategoryName);
 
-    // Filter author categories for display; must be non-standard category name, selectable, and NOT user-created.
-    const authorCategoryNames = selectableCategoryNames.filter(
-      (catName) =>
-        !this.isCategoryNameStandard(catName) &&
-        !this.isCategoryNameExcluded(catName) &&
-        !this.isCategoryWritable(schema, catName) &&
-        this.isCategoryDisplayable(schema, catName)
-    );
+    /* One flat annotations list: provenance (standard/author/user) no longer
+       partitions the sidebar. Declared prediction columns sort first. */
+    const annotationCategoryNames = selectableCategoryNames
+      .filter(
+        (catName) =>
+          !this.isCategoryNameExcluded(catName) &&
+          (this.isCategoryWritable(schema, catName) ||
+            this.isCategoryDisplayable(schema, catName)) &&
+          (!isCellGuideCxg || this.isCategoryNameStandard(catName))
+      )
+      .sort((a, b) => {
+        const aDeclared = a in predictions.byColumn ? 0 : 1;
+        const bDeclared = b in predictions.byColumn ? 0 : 1;
+        return aDeclared - bDeclared || a.localeCompare(b);
+      });
 
-    // Filter user-created categories for display; must be non-standard category name and writable.
-    const userCategoryNames = selectableCategoryNames.filter(
-      (catName) =>
-        !this.isCategoryNameStandard(catName) &&
-        !this.isCategoryNameExcluded(catName) &&
-        this.isCategoryWritable(schema, catName)
-    );
-
-    // Filter standard categories for display; must be standard name and selectable.
-    const standardCategoryNames = selectableCategoryNames.filter(
-      (catName) =>
-        this.isCategoryNameStandard(catName) &&
-        this.isCategoryDisplayable(schema, catName)
-    );
+    const categoryTypeOf = (catName: string): string => {
+      if (this.isCategoryWritable(schema, catName)) return "user";
+      if (this.isCategoryNameStandard(catName)) return "standard";
+      return "author";
+    };
     return (
       <div
         data-testid={CATEGORICAL_SECTION_TEST_ID}
@@ -282,117 +294,65 @@ class Categorical extends React.Component<Props, CategoricalState> {
           </div>
         )}
 
-        {isCellGuideCxg ? (
+        <Collapse>
+          <span>Annotations</span>
           <>
-            {standardCategoryNames.length &&
-              standardCategoryNames.map((catName: string) => (
-                <Category
-                  key={catName}
-                  metadataField={catName}
-                  onExpansionChange={this.onExpansionChange}
-                  isExpanded={expandedCategories.includes(catName)}
-                  categoryType="standard"
-                />
-              ))}
-          </>
-        ) : isVcpDeployment ? (
-          <>
-            {/* DATASET FIELDS - Combined standard and author categories when VCP deployment is enabled */}
-            {(standardCategoryNames.length > 0 ||
-              authorCategoryNames.length > 0) && (
-              <Collapse>
-                <span>Dataset Categories</span>
-                <>
-                  {standardCategoryNames.map((catName: string) => (
-                    <Category
-                      key={catName}
-                      metadataField={catName}
-                      onExpansionChange={this.onExpansionChange}
-                      isExpanded={expandedCategories.includes(catName)}
-                      categoryType="standard"
-                    />
-                  ))}
-                  {authorCategoryNames.map((catName: string) => (
-                    <Category
-                      key={catName}
-                      metadataField={catName}
-                      onExpansionChange={this.onExpansionChange}
-                      isExpanded={expandedCategories.includes(catName)}
-                      categoryType="author"
-                    />
-                  ))}
-                </>
-              </Collapse>
-            )}
-
-            {/* USER FIELDS */}
-            {userCategoryNames.length ? (
-              <Collapse>
-                <span>User Categories</span>
-                {userCategoryNames.map((catName: string) => (
-                  <Category
-                    key={catName}
-                    metadataField={catName}
-                    onExpansionChange={this.onExpansionChange}
-                    isExpanded={expandedCategories.includes(catName)}
-                    categoryType="user"
-                  />
-                ))}
-              </Collapse>
-            ) : null}
-          </>
-        ) : (
-          <>
-            {/* STANDARD FIELDS */}
-            {/* this is duplicative but flat, could be abstracted */}
-            {standardCategoryNames.length ? (
-              <Collapse>
-                <span>Standard Categories</span>
-                {standardCategoryNames.map((catName: string) => (
-                  <Category
-                    key={catName}
-                    metadataField={catName}
-                    onExpansionChange={this.onExpansionChange}
-                    isExpanded={expandedCategories.includes(catName)}
-                    categoryType="standard"
-                  />
-                ))}
-              </Collapse>
-            ) : null}
-
-            {/* AUTHOR FIELDS */}
-            {authorCategoryNames.length ? (
-              <Collapse>
-                <span>Author Categories</span>
-                {authorCategoryNames.map((catName: string) => (
-                  <Category
-                    key={catName}
-                    metadataField={catName}
-                    onExpansionChange={this.onExpansionChange}
-                    isExpanded={expandedCategories.includes(catName)}
-                    categoryType="author"
-                  />
-                ))}
-              </Collapse>
-            ) : null}
-
-            {/* USER FIELDS */}
-            {userCategoryNames.length ? (
-              <Collapse>
-                <span>User Categories</span>
-                {userCategoryNames.map((catName: string) => (
-                  <Category
-                    key={catName}
-                    metadataField={catName}
-                    onExpansionChange={this.onExpansionChange}
-                    isExpanded={expandedCategories.includes(catName)}
-                    categoryType="user"
-                  />
-                ))}
-              </Collapse>
+            {annotationCategoryNames.map((catName: string) => (
+              <Category
+                key={catName}
+                metadataField={catName}
+                onExpansionChange={this.onExpansionChange}
+                isExpanded={expandedCategories.includes(catName)}
+                categoryType={categoryTypeOf(catName)}
+              />
+            ))}
+            {hiddenCategoryNames.length ? (
+              <>
+                <div
+                  role="menuitem"
+                  tabIndex={0}
+                  data-testid="hidden-categories-toggle"
+                  onClick={() =>
+                    this.setState((prev) => ({
+                      ...prev,
+                      showHiddenCategories: !prev.showHiddenCategories,
+                    }))
+                  }
+                  onKeyPress={() =>
+                    this.setState((prev) => ({
+                      ...prev,
+                      showHiddenCategories: !prev.showHiddenCategories,
+                    }))
+                  }
+                  style={{
+                    color: globals.fgMuted,
+                    cursor: "pointer",
+                    fontFamily: globals.fontMonoCaps,
+                    fontSize: 9,
+                    fontWeight: globals.bold,
+                    letterSpacing: "0.05em",
+                    margin: "6px 0",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {showHiddenCategories ? "\u25be" : "\u25b8"}{" "}
+                  {hiddenCategoryNames.length} hidden
+                </div>
+                {showHiddenCategories
+                  ? hiddenCategoryNames.map((catName: string) => (
+                      <Category
+                        key={catName}
+                        metadataField={catName}
+                        onExpansionChange={this.onExpansionChange}
+                        isExpanded={expandedCategories.includes(catName)}
+                        categoryType={categoryTypeOf(catName)}
+                      />
+                    ))
+                  : null}
+              </>
             ) : null}
           </>
-        )}
+        </Collapse>
       </div>
     );
   }
@@ -406,6 +366,7 @@ function mapStateToProps(state: RootState): StateProps {
     writableCategoriesEnabled: state.annotations.writableCategoriesEnabled,
     writableGenesetsEnabled: state.annotations.writableGenesetsEnabled,
     isVcpDeployment: state.annotations.isVcpDeployment,
+    predictions: state.predictions,
   };
 }
 

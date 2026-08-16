@@ -18,6 +18,28 @@ export const LeftSidebarContainer = styled.div`
 export const PanelHeader = styled.div`
   border-bottom: 1px solid ${globals.borderSubtle};
   padding: 12px ${globals.leftSidebarSectionPadding}px 10px;
+  position: relative;
+`;
+
+export const CollapseToggle = styled.button`
+  align-items: center;
+  background: none;
+  border: none;
+  color: ${globals.fgMuted};
+  cursor: pointer;
+  display: flex;
+  height: 20px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 8px;
+  top: 10px;
+  width: 20px;
+
+  &:hover {
+    background: ${globals.borderSubtle};
+    color: ${globals.fgPrimary};
+  }
 `;
 
 export const DatasetRow = styled.div`
@@ -25,6 +47,8 @@ export const DatasetRow = styled.div`
   display: flex;
   gap: 8px;
   margin-bottom: 8px;
+  /* keep the name clear of the collapse toggle */
+  margin-right: 24px;
 `;
 
 export const DatasetLabel = styled.span`

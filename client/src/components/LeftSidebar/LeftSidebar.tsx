@@ -1,10 +1,14 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Icon } from "@blueprintjs/core";
+import { IconNames } from "@blueprintjs/icons";
 
 import { RootState } from "reducers";
+import PanelRail from "common/components/PanelRail/PanelRail";
 import Categorical from "./components/Categorical/Categorical";
 import Continuous from "./components/Continuous/Continuous";
 import {
+  CollapseToggle,
   DatasetLabel,
   DatasetName,
   DatasetRow,
@@ -27,6 +31,10 @@ function datasetNameFromPath(): string {
 }
 
 function LeftSideBar() {
+  const dispatch = useDispatch();
+  const collapsed = useSelector(
+    (state: RootState) => state.sidebarPanels.leftCollapsed
+  );
   const datasetName = useSelector(
     (state: RootState) =>
       state.datasetMetadata?.datasetMetadata?.dataset_name ??
@@ -42,10 +50,32 @@ function LeftSideBar() {
       ).length
   );
 
+  const toggle = () => {
+    dispatch({ type: "sidebar: toggle left" });
+    /* nudge the graph to re-measure its viewport */
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 0);
+  };
+
+  if (collapsed) {
+    return (
+      <LeftSidebarWrapper>
+        <PanelRail label="Metadata" side="left" onExpand={toggle} />
+      </LeftSidebarWrapper>
+    );
+  }
+
   return (
     <LeftSidebarWrapper>
       <LeftSidebarContainer>
         <PanelHeader>
+          <CollapseToggle
+            type="button"
+            data-testid="left-sidebar-collapse"
+            title="Collapse panel"
+            onClick={toggle}
+          >
+            <Icon icon={IconNames.DOUBLE_CHEVRON_LEFT} size={12} />
+          </CollapseToggle>
           <DatasetRow>
             <DatasetLabel>Dataset</DatasetLabel>
             <DatasetName title={datasetName}>{datasetName}</DatasetName>

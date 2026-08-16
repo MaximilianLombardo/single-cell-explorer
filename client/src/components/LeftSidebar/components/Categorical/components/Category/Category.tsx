@@ -17,6 +17,8 @@ import { Dataframe } from "util/dataframe";
 import { track } from "analytics";
 import { EVENTS } from "analytics/events";
 import { RootState, AppDispatch } from "reducers";
+import BrushableHistogram from "common/components/BrushableHistogram/BrushableHistogram";
+import { PredictionDeclaration } from "reducers/predictions";
 import * as globals from "~/globals";
 import { CategoryCrossfilterContext } from "../../categoryContext";
 import CategoryValue from "./components/CategoryValue/CategoryValue";
@@ -37,6 +39,8 @@ type CategoryAsyncProps = {
   colorTable: ColorTable;
   isColorAccessor: boolean;
   handleCategoryToggleAllClick: () => void;
+  /* per-label mean of the declared confidence column, when this category is a prediction */
+  labelConfidence: Map<string, number> | null;
 } & StateProps["colors"];
 
 interface PureCategoryProps {
@@ -55,6 +59,7 @@ interface StateProps {
   genesets: RootState["genesets"]["genesets"];
   isCellGuideCxg: boolean;
   annotations: RootState["annotations"];
+  prediction: PredictionDeclaration | null;
 }
 
 interface DispatchProps {
@@ -81,6 +86,7 @@ const mapStateToProps = (
     genesets: state.genesets.genesets,
     isCellGuideCxg: state.controls.isCellGuideCxg,
     annotations: state.annotations,
+    prediction: state.predictions.byColumn[metadataField] ?? null,
   };
 };
 
@@ -201,14 +207,62 @@ class Category extends React.PureComponent<CategoryProps> {
       colors
     );
 
+    const labelConfidence = await this.fetchLabelConfidence(
+      annoMatrix,
+      categoryData
+    );
+
     return {
       categoryData,
       categorySummary,
       colorData,
+      labelConfidence,
       ...this.updateColorTable(colorData),
       handleCategoryToggleAllClick: () =>
         this.handleToggleAllClick(categorySummary),
     };
+  };
+
+  /*
+  When this category is a declared prediction with a confidence column,
+  compute the mean confidence per label for the roster bars.
+  */
+  fetchLabelConfidence = async (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any --- annoMatrix is untyped in this file
+    annoMatrix: any,
+    categoryData: Dataframe
+  ): Promise<Map<string, number> | null> => {
+    const { prediction } = this.props;
+    if (!prediction?.confidence) return null;
+    const { schema } = annoMatrix;
+    if (!schema.annotations.obsByName[prediction.confidence]) return null;
+
+    const confData: Dataframe = await annoMatrix.fetch(
+      "obs",
+      prediction.confidence
+    );
+    const confArr = confData.icol(0).asArray() as number[];
+    const catCol = categoryData.icol(0);
+
+    const sums = new Map<string, { sum: number; count: number }>();
+    for (let i = 0, len = confArr.length; i < len; i += 1) {
+      const label = String(catCol.getLabelValue(i));
+      const v = confArr[i];
+      if (Number.isFinite(v)) {
+        const acc = sums.get(label);
+        if (acc) {
+          acc.sum += v;
+          acc.count += 1;
+        } else {
+          sums.set(label, { sum: v, count: 1 });
+        }
+      }
+    }
+    const means = new Map<string, number>();
+    sums.forEach((acc, label) => {
+      if (acc.count > 0) means.set(label, acc.sum / acc.count);
+    });
+    return means;
   };
 
   async fetchData(
@@ -323,6 +377,7 @@ class Category extends React.PureComponent<CategoryProps> {
       colors,
       annoMatrix,
       isCellGuideCxg,
+      prediction,
     } = this.props;
 
     const checkboxID = `category-select-${metadataField}`;
@@ -337,6 +392,7 @@ class Category extends React.PureComponent<CategoryProps> {
             annoMatrix,
             categoricalSelection,
             colors,
+            prediction,
           }}
         >
           <Async.Pending initial>
@@ -363,6 +419,7 @@ class Category extends React.PureComponent<CategoryProps> {
                 isColorAccessor,
                 handleCategoryToggleAllClick,
                 colorMode,
+                labelConfidence,
               } = asyncProps;
               const selectionState = this.getSelectionState(categorySummary);
               const { schema } = this.props;
@@ -387,6 +444,8 @@ class Category extends React.PureComponent<CategoryProps> {
                   colorMode={colorMode || ""}
                   isCellGuideCxg={isCellGuideCxg}
                   isUserAnnotation={isUserAnnotation}
+                  prediction={prediction}
+                  labelConfidence={labelConfidence}
                 />
               );
             }}
@@ -438,6 +497,7 @@ interface CategoryHeaderProps {
   onCategoryMenuKeyPress: (event: React.KeyboardEvent<HTMLSpanElement>) => void;
   onCategoryToggleAllClick: () => void;
   isUserAnnotation: boolean;
+  isPrediction: boolean;
 }
 
 const CategoryHeader = React.memo(
@@ -452,6 +512,7 @@ const CategoryHeader = React.memo(
     onCategoryMenuKeyPress,
     onCategoryToggleAllClick,
     isUserAnnotation,
+    isPrediction,
   }: CategoryHeaderProps) => {
     /*
     Render category name and controls (eg, color-by button).
@@ -516,6 +577,27 @@ const CategoryHeader = React.memo(
                 {metadataField}
               </span>
             </Truncate>
+            {isPrediction && !isExpanded ? (
+              /* folded declared columns stay identifiable */
+              <span
+                title="declared prediction"
+                style={{
+                  alignItems: "center",
+                  background: globals.accent,
+                  color: "#ffffff",
+                  display: "inline-flex",
+                  fontFamily: globals.fontMonoCaps,
+                  fontSize: 8,
+                  fontWeight: globals.bold,
+                  height: 12,
+                  justifyContent: "center",
+                  marginLeft: 5,
+                  width: 12,
+                }}
+              >
+                P
+              </span>
+            ) : null}
             {isExpanded ? (
               <FaChevronDown
                 data-testid="category-expand-is-expanded"
@@ -581,6 +663,8 @@ interface CategoryRenderProps {
   colorMode: string;
   isCellGuideCxg: boolean;
   isUserAnnotation: boolean;
+  prediction: PredictionDeclaration | null;
+  labelConfidence: Map<string, number> | null;
 }
 
 const CategoryRender = React.memo(
@@ -602,6 +686,8 @@ const CategoryRender = React.memo(
     colorMode,
     isCellGuideCxg,
     isUserAnnotation,
+    prediction,
+    labelConfidence,
   }: CategoryRenderProps) => {
     /*
     Render the core of the category, including checkboxes, controls, etc.
@@ -645,6 +731,7 @@ const CategoryRender = React.memo(
             onCategoryMenuClick={onCategoryMenuClick}
             onCategoryMenuKeyPress={onCategoryMenuKeyPress}
             isUserAnnotation={isUserAnnotation}
+            isPrediction={!!prediction}
           />
         </div>
         {isUserAnnotation ? (
@@ -652,6 +739,22 @@ const CategoryRender = React.memo(
             <AnnoDialogEditCategoryName metadataField={metadataField} />
             <AddLabelDialog metadataField={metadataField} />
           </>
+        ) : null}
+        {prediction && isExpanded ? (
+          <div
+            style={{
+              color: globals.fgMuted,
+              fontFamily: globals.fontMonoCaps,
+              fontSize: 8.5,
+              letterSpacing: "0.04em",
+              margin: "2px 0 3px 26px",
+              textTransform: "uppercase",
+            }}
+          >
+            {[prediction.method, prediction.run && `run ${prediction.run}`]
+              .filter(Boolean)
+              .join(" \u00b7 ")}
+          </div>
         ) : null}
         <div style={{ marginLeft: 26 }}>
           {
@@ -665,10 +768,27 @@ const CategoryRender = React.memo(
                 colorData={colorData}
                 colorTable={colorTable}
                 colorMode={colorMode}
+                labelConfidence={labelConfidence}
               />
             ) : null
           }
         </div>
+        {isExpanded && prediction?.confidence ? (
+          /* the prediction's evidence lives with the prediction, not in QC */
+          <div style={{ marginTop: 2 }}>
+            <BrushableHistogram
+              field={prediction.confidence}
+              isObs
+              mini={false}
+              width={
+                globals.leftSidebarWidth -
+                4 * globals.leftSidebarSectionPadding -
+                64
+              }
+              onGeneExpressionComplete={() => {}}
+            />
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -687,6 +807,7 @@ interface CategoryValueListProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any --- FIXME: disabled temporarily on migrate to TS.
   colorTable: any;
   colorMode: string;
+  labelConfidence: Map<string, number> | null;
 }
 const CategoryValueList = React.memo(
   ({
@@ -697,6 +818,7 @@ const CategoryValueList = React.memo(
     colorData,
     colorTable,
     colorMode,
+    labelConfidence,
   }: CategoryValueListProps) => {
     // Keep all tuples, including those with 0 counts
     const initialTuples = [...categorySummary.categoryValueIndices];
@@ -793,6 +915,7 @@ const CategoryValueList = React.memo(
             colorData={colorData}
             colorTable={colorTable}
             colorMode={colorMode}
+            labelConfidence={labelConfidence}
           />
         ))}
       </>

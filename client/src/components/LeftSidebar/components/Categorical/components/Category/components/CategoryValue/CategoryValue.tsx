@@ -44,6 +44,12 @@ function _currentLabelAsString(label: Category): string {
   return String(label);
 }
 
+/* 0.92 -> ".92"; 1 -> "1.0" — compact roster-bar annotation */
+function formatConfidence(v: number): string {
+  if (v >= 0.995) return "1.0";
+  return v.toFixed(2).replace(/^0/, "");
+}
+
 interface CellTypeInfoButtonProps {
   metadataField: string;
   displayString: string;
@@ -86,6 +92,8 @@ interface PureCategoryValueProps {
   colorTable: ColorTable;
   colorData: Dataframe | null;
   categoryData: Dataframe;
+  /* per-label mean confidence, when this category is a declared prediction */
+  labelConfidence?: Map<string, number> | null;
 }
 
 interface StateProps {
@@ -709,6 +717,10 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
 
     const count = categorySummary.categoryValueCounts[categoryIndex];
     const displayString = this.currentLabelAsString();
+    const { labelConfidence } = this.props;
+    const meanConfidence = labelConfidence?.get(displayString);
+    /* bar (24) + gaps (10) + value (18) */
+    const CONFIDENCE_WIDTH = meanConfidence !== undefined ? 52 : 0;
 
     /* this is the color scale, so add swatches below */
     const isColorBy =
@@ -739,12 +751,12 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
       (isUserAnnotation ? ANNO_MENU : 0);
 
     const labelWidth =
-      colorAccessor && !isColorBy
+      (colorAccessor && !isColorBy
         ? globals.leftSidebarWidth -
           otherElementsWidth -
           STACKED_BAR_WIDTH -
           CHART_MARGIN
-        : globals.leftSidebarWidth - otherElementsWidth;
+        : globals.leftSidebarWidth - otherElementsWidth) - CONFIDENCE_WIDTH;
 
     return (
       <div
@@ -768,7 +780,7 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
             margin: 0,
             padding: 0,
             userSelect: "none",
-            width: globals.leftSidebarWidth - 105,
+            width: globals.leftSidebarWidth - 105 - CONFIDENCE_WIDTH,
             display: "flex",
             justifyContent: "space-between",
           }}
@@ -875,6 +887,45 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
             >
               {count}
             </span>
+            {meanConfidence !== undefined ? (
+              <>
+                <span
+                  style={{
+                    background: globals.borderSubtle,
+                    display: "inline-block",
+                    height: 4,
+                    marginLeft: 6,
+                    position: "relative",
+                    top: -1,
+                    width: 24,
+                  }}
+                >
+                  <span
+                    style={{
+                      background: globals.accent,
+                      display: "block",
+                      height: "100%",
+                      width: Math.round(meanConfidence * 24),
+                    }}
+                  />
+                </span>
+                <span
+                  data-testid={`categorical-value-confidence-${metadataField}-${displayString}`}
+                  style={{
+                    color: globals.fgPrimary,
+                    display: "inline-block",
+                    fontFamily: globals.fontMonoData,
+                    fontSize: 9,
+                    fontWeight: 500,
+                    marginLeft: 4,
+                    textAlign: "right",
+                    width: 18,
+                  }}
+                >
+                  {formatConfidence(meanConfidence)}
+                </span>
+              </>
+            ) : null}
             <span style={{ verticalAlign: "baseline" }}>
               <svg
                 display={isColorBy && categoryValueIndices ? "auto" : "none"}

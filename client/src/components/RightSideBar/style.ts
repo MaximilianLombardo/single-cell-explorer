@@ -12,6 +12,28 @@ export const RightSidebarWrapper = styled.div`
   width: inherit;
 `;
 
+export const CollapseToggle = styled.button`
+  align-items: center;
+  background: none;
+  border: none;
+  color: ${globals.fgMuted};
+  cursor: pointer;
+  display: flex;
+  height: 20px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 6px;
+  top: 12px;
+  width: 20px;
+  z-index: 1;
+
+  &:hover {
+    background: ${globals.borderSubtle};
+    color: ${globals.fgPrimary};
+  }
+`;
+
 export const PanelFooter = styled.div`
   align-items: center;
   border-top: 1px solid ${globals.borderStrong};

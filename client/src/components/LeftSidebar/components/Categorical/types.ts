@@ -13,6 +13,7 @@ export interface StateProps {
   writableCategoriesEnabled: boolean;
   writableGenesetsEnabled: boolean;
   isVcpDeployment: boolean;
+  predictions: RootState["predictions"];
 }
 
 export type Props = StateProps & DispatchProps;
