@@ -19,9 +19,7 @@ import LeftSideBar from "../LeftSidebar/LeftSidebar";
 import RightSideBar from "../RightSideBar/RightSideBar";
 import Legend from "../Legend/Legend";
 import MenuBar from "../MenuBar/MenuBar";
-import NavBar from "../NavBar/NavBar";
 import GlobalHotkeys from "../GlobalHotkeys/GlobalHotkeys";
-import { selectIsSeamlessEnabled } from "../../selectors/datasetMetadata";
 import Graph from "../Graph/Graph";
 import Scatterplot from "../scatterplot/scatterplot";
 import PanelEmbedding from "../PanelEmbedding/PanelEmbedding";
@@ -32,12 +30,7 @@ interface StateProps {
   loading: RootState["controls"]["loading"];
   error: RootState["controls"]["error"];
   graphRenderCounter: number;
-  tosURL: string | undefined;
-  privacyURL: string;
-  seamlessEnabled: boolean;
-  datasetMetadataError: RootState["datasetMetadata"]["error"];
   datasetMetadata: RootState["datasetMetadata"];
-  isCellGuideCxg: RootState["controls"]["isCellGuideCxg"];
   scatterplotXXaccessor: RootState["controls"]["scatterplotXXaccessor"];
   scatterplotYYaccessor: RootState["controls"]["scatterplotYYaccessor"];
   differentialExpressionLoading: RootState["differential"]["loading"];
@@ -48,12 +41,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   loading: state.controls.loading,
   error: state.controls.error,
   graphRenderCounter: state.controls.graphRenderCounter,
-  tosURL: state.config?.parameters?.about_legal_tos,
-  privacyURL: state.config?.parameters?.about_legal_privacy || "",
-  seamlessEnabled: selectIsSeamlessEnabled(state),
-  datasetMetadataError: state.datasetMetadata.error,
   datasetMetadata: state.datasetMetadata,
-  isCellGuideCxg: state.controls.isCellGuideCxg,
   scatterplotXXaccessor: state.controls.scatterplotXXaccessor,
   scatterplotYYaccessor: state.controls.scatterplotYYaccessor,
   differentialExpressionLoading: state.differential.loading,
@@ -73,12 +61,7 @@ class App extends React.Component<StateProps & { dispatch: AppDispatch }> {
       loading,
       error,
       graphRenderCounter,
-      tosURL,
-      privacyURL,
-      seamlessEnabled,
-      datasetMetadataError,
       datasetMetadata,
-      isCellGuideCxg,
       differentialExpressionLoading,
       scatterplotXXaccessor,
       scatterplotYYaccessor,
@@ -161,16 +144,10 @@ class App extends React.Component<StateProps & { dispatch: AppDispatch }> {
                     </div>
                   </div>
                 ) : null}
-                {(seamlessEnabled ||
-                  datasetMetadataError === null ||
-                  isCellGuideCxg) &&
-                  process.env.DEPLOYMENT_TYPE !== "vcp-hosted" && (
-                    <NavBar tosURL={tosURL} privacyURL={privacyURL} />
-                  )}
                 {loading || error ? null : (
                   <>
                     <Layout
-                      addTopPadding={!datasetMetadataError || isCellGuideCxg}
+                      addTopPadding={false}
                       renderGraph={(viewportRef: HTMLDivElement) => (
                         <div
                           style={{

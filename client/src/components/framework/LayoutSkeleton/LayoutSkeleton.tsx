@@ -14,7 +14,7 @@ import { RightSidebarSkeleton } from "./components/RightSidebarSkeleton/RightSid
  */
 export function LayoutSkeleton(): JSX.Element {
   return (
-    <Layout addTopPadding>
+    <Layout addTopPadding={false}>
       <LeftSidebarSkeleton />
       <RightSidebarSkeleton />
       <Controls>

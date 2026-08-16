@@ -24,6 +24,7 @@ import {
 } from "./style";
 import Clip from "./components/Clip/Clip";
 
+import HelpMenu from "./components/HelpMenu/HelpMenu";
 import Subset from "./components/Subset/Subset";
 import DiffexpButtons from "./components/DiffExpButtons/DiffExpButtons";
 import Download from "./components/Download/Download";
@@ -276,6 +277,9 @@ const MenuBar = ({
         </EmbeddingWrapper>
         <ControlsWrapper>
           <ResponsiveMenuGroupTwo>
+            <ButtonGroup className={styles.menubarButton}>
+              <HelpMenu />
+            </ButtonGroup>
             <ButtonGroup className={styles.menubarButton}>
               <MenuBarAnchorButton
                 type="button"
