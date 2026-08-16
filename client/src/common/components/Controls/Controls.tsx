@@ -17,11 +17,12 @@ function Controls(props: Props): JSX.Element {
       style={{
         display: "flex",
         justifyContent: "space-between",
-        left: 8,
         position: "absolute",
-        right: 8,
         zIndex: 3,
-        ...(bottom !== undefined ? { bottom } : { top: 0 }),
+        /* top rail spans the full canvas width; bottom controls stay inset */
+        ...(bottom !== undefined
+          ? { bottom, left: 8, right: 8 }
+          : { top: 0, left: 0, right: 0 }),
       }}
     >
       {children}

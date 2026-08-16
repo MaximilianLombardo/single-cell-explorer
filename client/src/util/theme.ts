@@ -61,10 +61,10 @@ const tabularNums = "tabular-nums";
 
 const typography = {
   fontFamily: {
-    body: "Roboto Condensed",
-    caps: "Roboto Condensed",
-    header: "Roboto Condensed",
-    tabular: "Roboto Condensed",
+    body: "Inter",
+    caps: "IBM Plex Mono",
+    header: "Geist",
+    tabular: "Geist Mono",
   },
 
   styles: {
@@ -324,12 +324,12 @@ const themeOptions = { ...SDSAppTheme, ...customTheme };
 // Colors
 
 const primaryColors = {
-  "100": "#EBF5FF",
-  "200": "#7DBCFF",
-  "300": "#4599FF",
-  "400": "#0073FF",
-  "500": "#0056C6",
-  "600": "#00429F",
+  "100": "#EDF5FB",
+  "200": "#A8CFE9",
+  "300": "#76B5DF",
+  "400": "#4A9FD8",
+  "500": "#3580B4",
+  "600": "#266590",
 };
 
 export const textPrimary = (props: CommonThemeProps) =>
@@ -405,7 +405,7 @@ export const beta400 = (props: CommonThemeProps) =>
 export const beta600 = (props: CommonThemeProps) =>
   getColors(props)?.purple[600];
 
-export const OFF_WHITE = "#f8f8f8";
+export const OFF_WHITE = "#F7F8FA";
 
 export const PINK = "#E9429A";
 

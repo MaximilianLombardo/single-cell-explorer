@@ -48,7 +48,8 @@ function Layout({ children, addTopPadding, renderGraph = undefined }: Props) {
         position: "relative",
         top: 0,
         left: 0,
-        minWidth: "1240px",
+        minWidth: "1100px",
+        background: globals.surface,
       }}
     >
       <div

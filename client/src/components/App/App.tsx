@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Helmet, HelmetData } from "react-helmet-async";
+import { Agentation } from "agentation";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 import { ChromatinViewerProvider } from "common/hooks/useChromatinViewerSelectedGene";
@@ -8,6 +9,7 @@ import actions from "actions";
 import { RootState, AppDispatch } from "reducers";
 import Controls from "common/components/Controls/Controls";
 import { theme } from "util/theme";
+import * as globals from "~/globals";
 import DatasetSelector from "../DatasetSelector/DatasetSelector";
 import DiffexNotice from "../DiffexNotice/DiffexNotice";
 import Container from "../framework/container";
@@ -102,13 +104,61 @@ class App extends React.Component<StateProps & { dispatch: AppDispatch }> {
                 {error ? (
                   <div
                     style={{
+                      alignItems: "center",
+                      background: globals.surfaceSecondary,
+                      display: "flex",
+                      height: "100vh",
+                      justifyContent: "center",
+                      left: 0,
                       position: "fixed",
-                      fontWeight: 500,
-                      top: window.innerHeight / 2,
-                      left: window.innerWidth / 2 - 50,
+                      top: 0,
+                      width: "100vw",
                     }}
                   >
-                    error loading cellxgene
+                    <div
+                      style={{
+                        background: globals.surface,
+                        border: `1px solid ${globals.borderStrong}`,
+                        maxWidth: 420,
+                        padding: "18px 22px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          color: "#c23030",
+                          fontFamily: globals.fontMonoCaps,
+                          fontSize: 10,
+                          fontWeight: globals.bolder,
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Load error
+                      </div>
+                      <div
+                        style={{
+                          color: globals.fgPrimary,
+                          fontFamily: globals.fontHead,
+                          fontSize: 16,
+                          fontWeight: 650,
+                          margin: "6px 0 8px",
+                        }}
+                      >
+                        error loading cellxgene
+                      </div>
+                      <div
+                        style={{
+                          color: globals.fgSecondary,
+                          fontFamily: globals.fontBody,
+                          fontSize: 12,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        The data API did not return a usable dataset. Check that
+                        the server is running and that the dataset path in the
+                        URL is correct, then reload.
+                      </div>
+                    </div>
                   </div>
                 ) : null}
                 {(seamlessEnabled ||
@@ -167,6 +217,8 @@ class App extends React.Component<StateProps & { dispatch: AppDispatch }> {
           </EmotionThemeProvider>
           <DiffexNotice triggerOpen={differentialExpressionLoading} />
         </StyledEngineProvider>
+        {/* dev-only visual feedback toolbar; tree-shaken from prod builds */}
+        {process.env.NODE_ENV === "development" && <Agentation />}
       </Container>
     );
   }

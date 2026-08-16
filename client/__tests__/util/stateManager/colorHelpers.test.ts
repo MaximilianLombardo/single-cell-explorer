@@ -4,11 +4,13 @@ import { expect, test } from "@playwright/test";
 /*
 test color helpers
 */
+import * as d3 from "d3";
 import {
   createColorTable,
   loadUserColorConfig,
 } from "../../../src/util/stateManager/colorHelpers";
 import * as Dataframe from "../../../src/util/dataframe";
+import * as globals from "../../../src/globals";
 
 const { describe } = test;
 
@@ -113,8 +115,29 @@ describe("categorical color helpers", () => {
     const data = obsDataframe.col("categoricalColumn").asArray();
     const cats = schema.annotations.obsByName.categoricalColumn.categories;
     for (let i = 0; i < schema.dataframe.nObs; i += 1) {
-      expect(makeScale(ct.rgb, i)).toEqual(ct?.scale?.(cats.indexOf(data[i])));
+      expect(makeScale(ct.rgb, i)).toEqual(
+        ct?.scale?.(cats.indexOf(data[i])).toString()
+      );
     }
+  });
+
+  test("default scale uses the CVD-safe categorical palette, cycling", () => {
+    const ct = createColorTable({
+      colorMode: "color by categorical metadata",
+      colorByAccessor: "categoricalColumn",
+      colorByData: obsDataframe,
+      schema,
+      userColors: null,
+      isSpatial,
+    });
+    expect(ct?.scale).toBeDefined();
+    globals.categoricalPalette.forEach((hex: string, idx: number) => {
+      expect(ct?.scale?.(idx).toString()).toEqual(d3.rgb(hex).toString());
+    });
+    /* domains larger than the palette wrap around */
+    expect(ct?.scale?.(globals.categoricalPalette.length).toString()).toEqual(
+      d3.rgb(globals.categoricalPalette[0]).toString()
+    );
   });
 
   test("shuffle category order", () => {
@@ -140,7 +163,9 @@ describe("categorical color helpers", () => {
     const data = obsDataframe.col("categoricalColumn").asArray();
     const cats = schemaClone.annotations.obsByName.categoricalColumn.categories;
     for (let i = 0; i < schemaClone.dataframe.nObs; i += 1) {
-      expect(makeScale(ct.rgb, i)).toEqual(ct?.scale?.(cats.indexOf(data[i])));
+      expect(makeScale(ct.rgb, i)).toEqual(
+        ct?.scale?.(cats.indexOf(data[i])).toString()
+      );
     }
   });
 

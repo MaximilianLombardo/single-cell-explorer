@@ -1,4 +1,3 @@
-import { Colors } from "@blueprintjs/core";
 import { dispatchNetworkErrorMessageToUser } from "./util/actionHelpers";
 import ENV_DEFAULT from "../../environment.default.json";
 import { DataPortalProps, S3URI } from "./common/types/entities";
@@ -28,7 +27,7 @@ export const ONTOLOGY_TERM_ID_KEYS = [
 ];
 
 /* Unified navigation bar header height. */
-export const HEADER_HEIGHT_PX = 56;
+export const HEADER_HEIGHT_PX = 52;
 
 /* Added to Portal links from breadcrumbs if there is work in progress */
 export const QUERY_PARAM_EXPLAIN_NEW_TAB = "explainNewTab";
@@ -113,31 +112,74 @@ export const isMac =
   typeof navigator !== "undefined" &&
   navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
-/* colors */
-export const blue = Colors.BLUE3;
-export const linkBlue = Colors.BLUE5;
-export const lightestGrey = "rgb(249,249,249)";
-export const lighterGrey = "rgb(245,245,245)";
-export const lightGrey = Colors.LIGHT_GRAY1;
-export const mediumGrey = "rgb(153,153,153)";
-export const darkGrey = "rgb(102,102,102)";
-export const darkerGrey = "rgb(51,51,51)";
+/* ---------------------------------------------------------------------------
+Blueprint Instrument design tokens.
+Sharp, technical, instrument-like: white/cool-gray surfaces, 1px rules,
+square corners, restrained cyan accent, mono type for data readouts.
+--------------------------------------------------------------------------- */
 
-export const brightBlue = "#4a90e2";
+/* surfaces */
+export const surface = "#FFFFFF";
+export const surfaceSecondary = "#F7F8FA";
+
+/* ink */
+export const fgPrimary = "#1A1A1A";
+export const fgSecondary = "#666666";
+export const fgMuted = "#888888";
+
+/* rules & borders */
+export const borderStrong = "#1A1A1A"; /* panel/structural rules */
+export const borderSubtle = "#EEF0F2"; /* hairline separators */
+export const borderControl = "#C9CFD5"; /* control outlines */
+export const borderInner = "#E4E8EC"; /* dividers inside control groups */
+
+/* accent */
+export const accent = "#4A9FD8";
+
+/* Color-vision-deficiency-safe categorical palette (Okabe-Ito derived).
+   Used as the default cell-category scale; dataset-supplied colors win. */
+export const categoricalPalette = [
+  "#009E73",
+  "#CC79A7",
+  "#E69F00",
+  "#56B4E9",
+  "#D1B900",
+  "#7CE3CB",
+  "#9A7FD8",
+  "#D55E00",
+];
+
+/* instrument type stacks */
+export const fontHead = `"Geist", "Inter", "Helvetica Neue", sans-serif`;
+export const fontBody = `"Inter", "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
+export const fontMonoCaps = `"IBM Plex Mono", "Menlo", "Consolas", monospace`;
+export const fontMonoData = `"Geist Mono", "IBM Plex Mono", "Menlo", monospace`;
+
+/* legacy color aliases — kept so existing imports keep working */
+export const blue = accent;
+export const linkBlue = accent;
+export const lightestGrey = surfaceSecondary;
+export const lighterGrey = surfaceSecondary;
+export const lightGrey = borderControl;
+export const mediumGrey = fgMuted;
+export const darkGrey = fgSecondary;
+export const darkerGrey = "#333333";
+
+export const brightBlue = accent;
 export const brightGreen = "#A2D729";
 export const darkGreen = "#448C4D";
 
 export const nonFiniteCellColor = lightGrey;
-export const logoColor = "black"; /* logo pink: "#E9429A" */
+export const logoColor = fgPrimary; /* logo pink: "#E9429A" */
 
 /* typography constants */
 
-export const tiniestFontSize = 12;
-export const largestFontSize = 24;
-export const uppercaseLetterSpacing = "0.04em";
+export const tiniestFontSize = 11;
+export const largestFontSize = 22;
+export const uppercaseLetterSpacing = "0.06em";
 export const bold = 600;
 export const bolder = 700;
-export const accentFont = "Georgia,Times,Times New Roman,serif";
+export const accentFont = fontHead;
 export const maxParagraphWidth = 600;
 
 /* layout styles constants */
@@ -154,20 +196,21 @@ export const graphWidth = 700;
 export const graphHeight = 700;
 export const scatterplotMarginLeft = 11;
 
-/* graph width + right sidebar width + left sidebar width is just below 1440p */
-export const rightSidebarWidth = 365;
-export const leftSidebarWidth = 365;
+/* 52px nav / 260px metadata panel / fluid canvas / 260px genes panel */
+export const rightSidebarWidth = 260;
+export const leftSidebarWidth = 260;
 export const leftSidebarSectionHeading = {
-  fontSize: 18,
+  fontSize: 11,
   textTransform: "uppercase",
-  fontWeight: 500,
-  letterSpacing: ".05em",
+  fontWeight: 600,
+  letterSpacing: ".06em",
+  fontFamily: fontMonoCaps,
 };
 export const leftSidebarSectionPadding = 10;
 export const rightSidebarSectionPadding = 10;
-export const categoryLabelDisplayStringLongLength = 27;
-export const categoryLabelDisplayStringShortLength = 11;
-export const categoryDisplayStringMaxLength = 33;
+export const categoryLabelDisplayStringLongLength = 20;
+export const categoryLabelDisplayStringShortLength = 10;
+export const categoryDisplayStringMaxLength = 24;
 
 export const maxUserDefinedGenes = 25;
 export const maxGenes = 100;

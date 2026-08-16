@@ -31,21 +31,33 @@ const HistogramFooter = React.memo(
     <div>
       <div
         style={{
+          alignItems: "baseline",
           display: "flex",
+          fontFamily: '"IBM Plex Mono", Menlo, monospace',
+          fontSize: 9,
           justifyContent: hideRanges ? "center" : "space-between",
+          letterSpacing: "0.02em",
+          paddingTop: 2,
         }}
       >
         <span
           style={{
             color: rangeColorMin,
             display: hideRanges ? "none" : "block",
+            whiteSpace: "nowrap",
           }}
         >
           min {rangeMin.toPrecision(4)}
         </span>
         <span
           data-testid="brushable-histogram-field-name"
-          style={{ fontStyle: "italic" }}
+          style={{
+            color: "#666666",
+            fontWeight: 500,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
         >
           {isObs && displayName}
           {isGeneSetSummary && "gene set mean expression"}
@@ -57,6 +69,7 @@ const HistogramFooter = React.memo(
           style={{
             color: rangeColorMax,
             display: hideRanges ? "none" : "block",
+            whiteSpace: "nowrap",
           }}
         >
           max {rangeMax.toPrecision(4)}

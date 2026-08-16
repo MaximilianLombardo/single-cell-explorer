@@ -13,6 +13,7 @@ import actions from "actions";
 import { Dataframe, DataframeValue } from "util/dataframe";
 import { track } from "analytics";
 import { EVENTS } from "analytics/events";
+import { FeatureIndexEyebrow, HeaderBox, HeaderRow } from "../../style";
 import Gene from "../Gene/Gene";
 import {
   FuzzySortResult,
@@ -192,16 +193,23 @@ export function QuickGene() {
         onKeyPress={handleExpand}
         style={{
           cursor: "pointer",
+          marginBottom: 0,
         }}
         onClick={handleExpand}
       >
-        Genes{" "}
-        {isExpanded ? (
-          <Icon icon={IconNames.CHEVRON_DOWN} />
-        ) : (
-          <Icon icon={IconNames.CHEVRON_RIGHT} />
-        )}
+        <HeaderRow>
+          <HeaderBox>Genes</HeaderBox>
+          {isExpanded ? (
+            <Icon icon={IconNames.CHEVRON_DOWN} size={12} />
+          ) : (
+            <Icon icon={IconNames.CHEVRON_RIGHT} size={12} />
+          )}
+        </HeaderRow>
       </H4>
+      <FeatureIndexEyebrow>
+        Feature index
+        {geneNames.length ? ` / ${geneNames.length.toLocaleString()}` : ""}
+      </FeatureIndexEyebrow>
       {isExpanded && (
         <>
           <div style={{ marginBottom: "8px" }} data-testid="gene-search">

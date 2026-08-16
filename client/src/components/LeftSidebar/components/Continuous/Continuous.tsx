@@ -33,9 +33,12 @@ class Continuous extends React.PureComponent<StateProps> {
       .filter((col: AnnotationColumnSchema) => !col.writable) // skip user annotations - they will be treated as categorical
       .map((col: AnnotationColumnSchema) => col.name);
     return allContinuousNames.length ? (
-      <div data-testid={CONTINUOUS_SECTION_TEST_ID}>
+      <div
+        data-testid={CONTINUOUS_SECTION_TEST_ID}
+        style={{ padding: "0 10px" }}
+      >
         <Collapse>
-          <span style={{ paddingLeft: 10 }}>Continuous</span>
+          <span>Continuous</span>
           {allContinuousNames.map((key, index) => (
             <BrushableHistogram
               key={key}

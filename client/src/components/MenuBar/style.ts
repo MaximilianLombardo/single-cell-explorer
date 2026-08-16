@@ -1,19 +1,25 @@
 import styled from "@emotion/styled";
 import { AnchorButton } from "@blueprintjs/core";
-import { spacesS } from "util/theme";
 import { getFeatureFlag } from "util/featureFlags/featureFlags";
 import { FEATURES } from "util/featureFlags/features";
+import * as globals from "~/globals";
 
 export const MAX_VERTICAL_THRESHOLD_WIDTH_PX = 500;
 const isTest = getFeatureFlag(FEATURES.TEST);
 
 const FIRST_VERTICAL_THRESHOLD_WIDTH_PX = isTest ? 705 : 685;
 
+/* Canvas control rail: a solid 44px instrument strip across the top of the
+   visualization region. Groups inside keep their responsive stacking. */
 export const MenuBarWrapper = styled.div`
+  background: ${globals.surface};
+  border-bottom: 1px solid ${globals.borderSubtle};
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+  min-height: 44px;
+  padding: 0 8px 8px 8px;
   width: 100%;
   position: relative;
   container: menu-bar / inline-size;
@@ -51,7 +57,7 @@ export const EmbeddingWrapper = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: left;
-  margin-top: ${spacesS}px;
+  margin-top: 9px;
 `;
 
 export const ControlsWrapper = styled.div`

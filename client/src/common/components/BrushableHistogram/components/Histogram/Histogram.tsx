@@ -44,7 +44,7 @@ const Histogram = ({
     const { x, y, bins, binStart, binEnd, binWidth } = histogram;
     const svg = d3.select(svgRef.current);
     const binPadding = mini ? 0 : -1;
-    const defaultBarColor = mini ? "black" : "#bbb";
+    const defaultBarColor = "#1a1a1a";
 
     /* Remove everything */
     svg.selectAll("*").remove();
@@ -169,9 +169,13 @@ const Histogram = ({
         );
 
       /* axis style */
-      svg.selectAll(".axis text").style("fill", "rgb(80,80,80)");
-      svg.selectAll(".axis path").style("stroke", "rgb(230,230,230)");
-      svg.selectAll(".axis line").style("stroke", "rgb(230,230,230)");
+      svg
+        .selectAll(".axis text")
+        .style("fill", "#888888")
+        .style("font-family", '"IBM Plex Mono", Menlo, monospace')
+        .style("font-size", "8px");
+      svg.selectAll(".axis path").style("stroke", "#e4e8ec");
+      svg.selectAll(".axis line").style("stroke", "#e4e8ec");
 
       setBrush({ brushX, brushXselection });
     }

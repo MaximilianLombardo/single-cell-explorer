@@ -505,6 +505,9 @@ const CategoryHeader = React.memo(
             <Truncate>
               <span
                 style={{
+                  fontFamily: globals.fontBody,
+                  fontSize: 11,
+                  fontWeight: 650,
                   maxWidth: LABEL_WIDTH,
                 }}
                 data-testid={`${metadataField}:category-label`}

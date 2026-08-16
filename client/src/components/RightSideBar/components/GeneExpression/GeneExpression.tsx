@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Button, H4, H5, Icon } from "@blueprintjs/core";
+import { Button, H5, Icon } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
 import { track } from "analytics";
@@ -13,6 +13,7 @@ import CreateGenesetDialogue from "./components/CreateGenesetDialogue/CreateGene
 
 import * as globals from "~/globals";
 import { MARKER_GENE_SUFFIX_IDENTIFIER } from "./constants";
+import { SectionBand, SectionBandLabel } from "./style";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any --- FIXME: disabled temporarily on migrate to TS.
 type State = any;
@@ -192,45 +193,33 @@ class GeneExpression extends React.Component<{}, State> {
       >
         <QuickGene />
         <div>
-          <div
-            data-chromatic="ignore"
-            className="chromatic-ignore"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <H4
+          <SectionBand data-chromatic="ignore" className="chromatic-ignore">
+            <SectionBandLabel
               role="menuitem"
               // @ts-expect-error ts-migrate(2322) FIXME: Type 'string' is not assignable to type 'number | ... Remove this comment to see the full error message
               tabIndex="0"
               data-testid="geneset-heading-expand"
               data-chromatic="ignore"
               onKeyPress={this.handleExpandGeneSets}
-              style={{
-                cursor: "pointer",
-              }}
               onClick={this.handleExpandGeneSets}
             >
               Gene Sets{" "}
               {geneSetsExpanded ? (
-                <Icon icon={IconNames.CHEVRON_DOWN} />
+                <Icon icon={IconNames.CHEVRON_DOWN} size={12} />
               ) : (
-                <Icon icon={IconNames.CHEVRON_RIGHT} />
+                <Icon icon={IconNames.CHEVRON_RIGHT} size={12} />
               )}
-            </H4>
+            </SectionBandLabel>
 
-            <div style={{ marginBottom: 10, position: "relative", top: -2 }}>
-              <Button
-                data-testid="open-create-geneset-dialog"
-                onClick={this.handleActivateCreateGenesetMode}
-                intent="primary"
-              >
-                Create new
-              </Button>
-            </div>
-          </div>
+            <Button
+              data-testid="open-create-geneset-dialog"
+              onClick={this.handleActivateCreateGenesetMode}
+              intent="primary"
+              small
+            >
+              Create new
+            </Button>
+          </SectionBand>
           <CreateGenesetDialogue />
         </div>
 

@@ -23,7 +23,14 @@ import { AnnoMatrixObsCrossfilter } from "annoMatrix";
 import { shouldShowOpenseadragon } from "common/selectors";
 import { sidePanelAttributeNameChange } from "../../../components/Graph/util";
 import * as globals from "~/globals";
-import { ImageToggleWrapper, ImageDropdownButton } from "./style";
+import {
+  ImageToggleWrapper,
+  ImageDropdownButton,
+  SelectorGroup,
+  SelectorKey,
+  CountReadout,
+  CountReadoutUnit,
+} from "./style";
 import Opacities from "./components/Opacities/Opacities";
 import {
   thunkTrackColorByCategoryChangeEmbedding,
@@ -157,55 +164,59 @@ const Embedding = (props: Props) => {
       }}
     >
       <ButtonGroup>
-        <Popover
-          hasBackdrop
-          onOpening={handleLayoutChoiceClick}
-          position={Position.TOP_LEFT}
-          content={
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "flex-start",
-                flexDirection: "column",
-                padding: 10,
-                width: 400,
-              }}
-            >
-              <H4>Embedding Choice</H4>
-              <p style={{ fontStyle: "italic" }}>
-                There are {schema?.dataframe?.nObs} cells in the entire dataset.
-              </p>
-              <EmbeddingChoices
-                onChange={handleLayoutChoiceChange}
-                annoMatrix={annoMatrix}
-                layoutChoice={layoutChoice}
-              />
-            </div>
-          }
-        >
-          <Tooltip
-            content="Select embedding for visualization"
-            position="top"
-            hoverOpenDelay={globals.tooltipHoverOpenDelay}
+        <SelectorGroup>
+          <SelectorKey>Embedding</SelectorKey>
+          <Popover
+            hasBackdrop
+            onOpening={handleLayoutChoiceClick}
+            position={Position.TOP_LEFT}
+            content={
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "flex-start",
+                  flexDirection: "column",
+                  padding: 10,
+                  width: 400,
+                }}
+              >
+                <H4>Embedding Choice</H4>
+                <p style={{ fontStyle: "italic" }}>
+                  There are {schema?.dataframe?.nObs} cells in the entire
+                  dataset.
+                </p>
+                <EmbeddingChoices
+                  onChange={handleLayoutChoiceChange}
+                  annoMatrix={annoMatrix}
+                  layoutChoice={layoutChoice}
+                />
+              </div>
+            }
           >
-            <Button
-              type="button"
-              data-testid={sidePanelAttributeNameChange(
-                LAYOUT_CHOICE_TEST_ID,
-                isSidePanel
-              )}
-              id="embedding"
-              style={{
-                cursor: "pointer",
-              }}
-              icon={IconNames.GRAPH}
-              rightIcon={IconNames.CARET_DOWN}
+            <Tooltip
+              content="Select embedding for visualization"
+              position="top"
+              hoverOpenDelay={globals.tooltipHoverOpenDelay}
             >
-              {layoutChoice?.current}
-            </Button>
-          </Tooltip>
-        </Popover>
+              <Button
+                type="button"
+                data-testid={sidePanelAttributeNameChange(
+                  LAYOUT_CHOICE_TEST_ID,
+                  isSidePanel
+                )}
+                id="embedding"
+                style={{
+                  cursor: "pointer",
+                }}
+                icon={IconNames.GRAPH}
+                rightIcon={IconNames.CARET_DOWN}
+              >
+                {layoutChoice?.current}
+              </Button>
+            </Tooltip>
+          </Popover>
+        </SelectorGroup>
         {!isSidePanel && !isSingleEmbedding && (
           <Button
             icon={IconNames.MULTI_SELECT}
@@ -267,22 +278,13 @@ const Embedding = (props: Props) => {
       </ButtonGroup>
 
       {!isSidePanel && (
-        <span
-          style={{
-            color: "#767676",
-            fontWeight: 400,
-            marginTop: "8px",
-            /**
-             * (thuang): This needs to be taken out of the normal flow to prevent
-             * expanding the parent container height and distorting the action button icon sizes
-             */
-            position: "absolute",
-            top: "35px",
-            left: "0",
-          }}
-        >
-          {crossfilter.countSelected()} of {crossfilter.size()} cells
-        </span>
+        /* Out of normal flow so it doesn't expand the rail height. */
+        <CountReadout>
+          {crossfilter.countSelected().toLocaleString()}
+          <CountReadoutUnit>of</CountReadoutUnit>
+          {crossfilter.size().toLocaleString()}
+          <CountReadoutUnit>cells</CountReadoutUnit>
+        </CountReadout>
       )}
     </div>
   );

@@ -278,7 +278,7 @@ const ContinuousLegend: React.FC<Props> = ({
       style={{
         position: "absolute",
         left: 8,
-        top: CELL_COUNT_ELEMENT_HEIGHT_PX + 35,
+        top: CELL_COUNT_ELEMENT_HEIGHT_PX + 62,
         zIndex: 1,
         pointerEvents: "none",
       }}

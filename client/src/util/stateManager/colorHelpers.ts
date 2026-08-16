@@ -2,7 +2,7 @@
  * Helper functions for the embedded graph colors
  */
 import * as d3 from "d3";
-import { interpolateRainbow, interpolateCool } from "d3-scale-chromatic";
+import { interpolateCool } from "d3-scale-chromatic";
 import memoize from "memoize-one";
 import { VAR_FEATURE_NAME_COLUMN } from "../../common/constants";
 import * as globals from "../../globals";
@@ -259,14 +259,16 @@ function _createColorsByCategoricalMetadata(
     colorAccessor
   ] as CategoricalAnnotationColumnSchema;
 
-  const scale = d3
-    .scaleSequential(interpolateRainbow)
-    .domain([0, categories?.length || 0]);
+  /* CVD-safe categorical palette; cycles past its length for large domains */
+  const palette = globals.categoricalPalette;
+  const scale = (idx: number): d3.RGBColor =>
+    d3.rgb(palette[idx % palette.length]);
+  scale.domain = () => [0, categories?.length || 0];
 
   /* pre-create colors - much faster than doing it for each obs */
   const colors = categories?.reduce((acc: CategoryColors, cat, idx) => {
     const internalRep = col.getInternalRep(cat as string);
-    acc[String(internalRep)] = parseRGB(scale(idx));
+    acc[String(internalRep)] = parseRGB(palette[idx % palette.length]);
     return acc;
   }, {});
 

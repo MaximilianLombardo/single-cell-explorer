@@ -34,8 +34,13 @@ const MARGIN = {
   BOTTOM: 25, // space for X axis & labels
   TOP: 3,
 };
-const WIDTH = 340 - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = 135 - MARGIN.TOP - MARGIN.BOTTOM;
+/* Histograms fill the sidebar column: panel width minus section padding. */
+const WIDTH =
+  globals.leftSidebarWidth -
+  2 * globals.leftSidebarSectionPadding -
+  MARGIN.LEFT -
+  MARGIN.RIGHT;
+const HEIGHT = 100 - MARGIN.TOP - MARGIN.BOTTOM;
 const MARGIN_MINI = {
   LEFT: 0, // Space for 0 tick label on X axis
   RIGHT: 0, // space for Y axis & labels
@@ -387,12 +392,12 @@ class HistogramBrush extends React.PureComponent<BrushableHistogramProps> {
 
     const unclippedRangeColor = [
       !isClipped || (annoMatrix as AnnoMatrixClipView).clipRange[0] === 0
-        ? "#bbb"
-        : globals.blue,
+        ? globals.fgMuted
+        : globals.accent,
 
       !isClipped || (annoMatrix as AnnoMatrixClipView).clipRange[1] === 1
-        ? "#bbb"
-        : globals.blue,
+        ? globals.fgMuted
+        : globals.accent,
     ];
 
     const histogram = this.calcHistogramCache(

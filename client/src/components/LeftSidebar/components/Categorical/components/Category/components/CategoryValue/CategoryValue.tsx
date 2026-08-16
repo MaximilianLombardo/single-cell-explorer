@@ -38,7 +38,7 @@ import styles from "../../../../categorical.css";
 import * as globals from "~/globals";
 
 const STACKED_BAR_HEIGHT = 11;
-const STACKED_BAR_WIDTH = 100;
+const STACKED_BAR_WIDTH = 56;
 
 function _currentLabelAsString(label: Category): string {
   return String(label);
@@ -724,12 +724,12 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
 
     const valueToggleLabel = `value-toggle-checkbox-${metadataField}-${displayString}`;
 
-    const LEFT_MARGIN = 60;
+    const LEFT_MARGIN = 24;
     const CHECKBOX = 26;
-    const CELL_NUMBER = 50;
+    const CELL_NUMBER = 30;
     const ANNO_MENU = 26;
-    const LABEL_MARGIN = 16;
-    const CHART_MARGIN = 24;
+    const LABEL_MARGIN = 12;
+    const CHART_MARGIN = 10;
 
     const otherElementsWidth =
       LEFT_MARGIN +
@@ -759,7 +759,6 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
           alignItems: "baseline",
           justifyContent: "space-between",
           marginBottom: "2px",
-          borderRadius: "2px",
         }}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseExit}
@@ -769,7 +768,7 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
             margin: 0,
             padding: 0,
             userSelect: "none",
-            width: globals.leftSidebarWidth - 120,
+            width: globals.leftSidebarWidth - 105,
             display: "flex",
             justifyContent: "space-between",
           }}
@@ -794,10 +793,11 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
                 tabIndex={-1}
                 style={{
                   width: labelWidth - 25,
+                  fontSize: 11,
                   color:
                     displayString === globals.unassignedCategoryLabel
-                      ? "#ababab"
-                      : "black",
+                      ? globals.fgMuted
+                      : globals.darkerGrey,
                   fontStyle:
                     displayString === globals.unassignedCategoryLabel
                       ? "italic"
@@ -861,12 +861,15 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
               style={{
                 color:
                   displayString === globals.unassignedCategoryLabel
-                    ? "#ababab"
-                    : "black",
+                    ? globals.fgMuted
+                    : globals.fgSecondary,
+                fontFamily: globals.fontMonoData,
+                fontSize: 10,
+                fontWeight: 500,
                 fontStyle:
                   displayString === globals.unassignedCategoryLabel
                     ? "italic"
-                    : "auto",
+                    : "normal",
                 top: "10px",
               }}
             >
@@ -876,11 +879,12 @@ class CategoryValue extends React.Component<Props, InternalStateProps> {
               <svg
                 display={isColorBy && categoryValueIndices ? "auto" : "none"}
                 style={{
-                  top: 3,
-                  width: 15,
-                  height: 15,
-                  marginLeft: 5,
+                  top: 1,
+                  width: 9,
+                  height: 9,
+                  marginLeft: 6,
                   position: "relative",
+                  borderRadius: "50%",
                   backgroundColor:
                     isColorBy && categoryValueIndices && colorScale
                       ? (colorScale(

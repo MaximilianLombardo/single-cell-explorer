@@ -182,7 +182,7 @@ export class CentroidLabels extends PureComponent {
                   dilatedValue={dilatedValue}
                   coords={coords}
                   inverseTransform={inverseTransform}
-                  opactity={selected ? 1 : deselectOpacity}
+                  opacity={selected ? 1 : deselectOpacity}
                   colorAccessor={colorAccessor}
                   displayLabel={displayLabel}
                   fullDisplayLabel={fullDisplayLabel} // not truncated, used for tests.
@@ -213,11 +213,11 @@ const Label = ({
   /*
   Render a label at a given coordinate.
   */
-  let fontSize = "15px";
-  let fontWeight = null;
+  let fontSize = "11.5px";
+  let fontWeight = "500";
   if (label === dilatedValue) {
-    fontSize = "18px";
-    fontWeight = "800";
+    fontSize = "13px";
+    fontWeight = "700";
   }
 
   return (
@@ -232,13 +232,17 @@ const Label = ({
         transform={inverseTransform}
         textAnchor="middle"
         style={{
+          fontFamily: '"Inter", "Helvetica Neue", sans-serif',
           fontSize,
-          // @ts-expect-error ts-migrate(2322) FIXME: Type 'string | null' is not assignable to type 'Fo... Remove this comment to see the full error message
-          fontWeight,
-          fill: "black",
+          fontWeight: fontWeight as React.CSSProperties["fontWeight"],
+          fill: "#1a1a1a",
+          /* white halo stands in for the label chip without extra geometry */
+          stroke: "#ffffff",
+          strokeWidth: 3,
+          strokeLinejoin: "round",
+          paintOrder: "stroke",
           userSelect: "none",
-          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ opacity: any; }' is not assignable to type... Remove this comment to see the full error message
-          opacity: { opacity },
+          opacity,
         }}
         onMouseEnter={(e) => onMouseEnter(e, colorAccessor, label)}
         onMouseOut={(e) => onMouseOut(e, colorAccessor, label)}
